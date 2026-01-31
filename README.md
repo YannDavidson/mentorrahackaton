@@ -74,8 +74,9 @@ Mentors are **pattern-based personas**, not impersonations.
 
 Initial set:
 - **Adrian Insight** — startup fundamentals, PMF, focus
-- **Helena Catalyst** — first revenue, sales, pricing, resilience
+- **Katerina Catalyst** — first revenue, sales, pricing, resilience
 - **Sophia Architect** — experience, trust, narrative, differentiation
+- **Vincent Forge** — startup fundamentals, The Impossible Builder
 
 Mentors produce structured briefs with:
 1. Diagnosis  
