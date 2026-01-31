@@ -1,0 +1,113 @@
+import os
+import json
+from typing import Optional, List
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from openai import OpenAI
+from dotenv import load_dotenv
+
+# Load environment variables (Ensure OPENAI_API_KEY is set in .env)
+load_dotenv()
+
+app = FastAPI(title="Mentorra Backend")
+
+# Allow CORS for local frontend development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+# --- Data Models ---
+
+class FounderProfile(BaseModel):
+    industry: Optional[str] = None
+    stage: Optional[str] = None
+    key_challenges: Optional[List[str]] = []
+
+class UserRequest(BaseModel):
+    user_message: str
+    founder_profile: Optional[FounderProfile] = None
+    active_mentor_track: Optional[str] = None
+    memory_context: Optional[str] = "" # Previous conversation summary
+
+class MentorResponse(BaseModel):
+    mentor_track: str
+    switched_track: bool
+    reply: str
+    clarifying_question: Optional[str] = None
+    next_actions: List[str]
+    memory_update: str
+
+# --- Toolhouse Agent Logic ---
+
+SYSTEM_PROMPT_TEMPLATE = """
+You are the Mentorra Routing Agent. You act as the brain behind a founder's mentorship experience.
+
+You will receive:
+- role: The current agent role (Router & Mentor Persona)
+- user_message: A single string from the founder
+- founder_profile: JSON summary of what we know so far
+- active_mentor: Current mentor track id if already selected
+- memory_context: Previous context of the conversation
+
+Primary goals:
+1) Classify the user’s message into exactly ONE mentor track (e.g., "Product", "Sales", "Fundraising", "Leadership", "Growth").
+2) Decide whether we should switch mentors or stay on the current one. Prefer stability unless the user’s intent clearly changed.
+3) Reply as the selected mentor in a concise, supportive, operator style (no fluff).
+4) Ask at most ONE clarifying question, only if necessary to proceed.
+5) Provide 2–5 next actions that the founder can do immediately (this week).
+6) Update "memory_update" compactly so the next call stays consistent.
+
+Output must be valid JSON matching this schema:
+{
+  "mentor_track": "string",
+  "switched_track": boolean,
+  "reply": "string",
+  "clarifying_question": "string or null",
+  "next_actions": ["action1", "action2"],
+  "memory_update": "string summary of new facts"
+}
+"""
+
+@app.post("/api/mentor-assist", response_model=MentorResponse)
+async def mentor_assist(request: UserRequest):
+    try:
+        # Construct the input payload for the LLM
+        user_input_context = f"""
+        INPUT DATA:
+        - User Message: \"{request.user_message}\"
+        - Active Mentor Track: {request.active_mentor_track if request.active_mentor_track else "None"}
+        - Founder Profile: {request.founder_profile.model_dump_json() if request.founder_profile else "Unknown"}
+        - Memory Context: {request.memory_context}
+        """
+
+        # Call OpenAI (or your specific Toolhouse LLM provider)
+        completion = client.chat.completions.create(
+            model="gpt-4-turbo", # Or gpt-3.5-turbo for speed/cost
+            response_format={"type": "json_object"},
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE},
+                {"role": "user", "content": user_input_context}
+            ],
+            temperature=0.7
+        )
+
+        # Parse the LLM response
+        raw_content = completion.choices[0].message.content
+        data = json.loads(raw_content)
+
+        return MentorResponse(**data)
+
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
