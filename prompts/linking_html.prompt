@@ -1,0 +1,1100 @@
+below is the front end code in html.
+
+```
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mentorra — Voice Mentor Boardroom</title>
+  <style>
+    :root{
+      --bg1:#f6f7fb;
+      --bg2:#eef2ff;
+      --card:#ffffffcc;
+      --cardSolid:#fff;
+      --text:#0b1220;
+      --muted:#5a657a;
+      --line:#e6e8ef;
+      --shadow: 0 18px 60px rgba(10, 20, 40, .10);
+      --shadow2: 0 10px 30px rgba(10, 20, 40, .08);
+      --radius: 18px;
+
+      --accent1:#6d5efc;
+      --accent2:#18a0fb;
+      --good:#16a34a;
+      --warn:#f59e0b;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 10% 5%, rgba(109,94,252,.15), transparent 55%),
+        radial-gradient(1100px 700px at 90% 10%, rgba(24,160,251,.14), transparent 55%),
+        radial-gradient(900px 600px at 70% 95%, rgba(22,163,74,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg2), var(--bg1));
+      min-height:100vh;
+    }
+
+    .wrap{
+      max-width:1180px;
+      margin:0 auto;
+      padding:26px 18px 44px;
+    }
+
+    /* Header */
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:12px 6px 20px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+    }
+    .orb{
+      width:44px; height:44px; border-radius:999px;
+      background:
+        radial-gradient(14px 14px at 30% 28%, rgba(255,255,255,.95), rgba(255,255,255,.15)),
+        radial-gradient(24px 24px at 70% 72%, rgba(255,255,255,.18), rgba(255,255,255,.02)),
+        conic-gradient(from 200deg, rgba(109,94,252,.95), rgba(24,160,251,.92), rgba(22,163,74,.75), rgba(109,94,252,.95));
+      box-shadow: 0 16px 40px rgba(109,94,252,.22);
+      position:relative;
+      overflow:hidden;
+    }
+    .orb::after{
+      content:"";
+      position:absolute; inset:-40%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), transparent 55%);
+      transform: rotate(18deg);
+    }
+    .brand h1{
+      font-size:16px; letter-spacing:.2px; margin:0;
+      display:flex; flex-direction:column;
+    }
+    .brand small{ color:var(--muted); font-weight:500; margin-top:2px; }
+
+    .topActions{
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    }
+    .pill{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.6);
+      backdrop-filter: blur(10px);
+      padding:10px 12px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+      display:flex; align-items:center; gap:8px;
+      box-shadow: var(--shadow2);
+    }
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--good);
+      box-shadow: 0 0 0 4px rgba(22,163,74,.10);
+    }
+
+    /* Layout */
+    .grid{
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap:16px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns:1fr; }
+    }
+
+    .card{
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+    .cardHeader{
+      padding:16px 16px 12px;
+      border-bottom:1px solid var(--line);
+      background: rgba(255,255,255,.55);
+    }
+    .cardHeader h2{
+      margin:0;
+      font-size:13px;
+      letter-spacing:.2px;
+    }
+    .cardHeader p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.4;
+    }
+    .cardBody{ padding:14px 16px 16px; }
+
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin:10px 0 6px;
+    }
+    input, textarea, select{
+      width:100%;
+      font: inherit;
+      border:1px solid var(--line);
+      border-radius: 12px;
+      padding:10px 12px;
+      background: rgba(255,255,255,.85);
+      outline:none;
+    }
+    textarea{ min-height:92px; resize:vertical; }
+    input:focus, textarea:focus, select:focus{
+      border-color: rgba(109,94,252,.55);
+      box-shadow: 0 0 0 4px rgba(109,94,252,.10);
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width:980px){ .row{ grid-template-columns:1fr; } }
+
+    .btnRow{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top:12px;
+    }
+    button{
+      appearance:none;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.85);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 999px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:12px;
+      box-shadow: var(--shadow2);
+      transition: transform .06s ease, background .2s ease, border-color .2s ease;
+    }
+    button:hover{ transform: translateY(-1px); border-color: rgba(109,94,252,.35); }
+    button:active{ transform: translateY(0px); }
+    .primary{
+      border-color: rgba(109,94,252,.35);
+      background: linear-gradient(135deg, rgba(109,94,252,.95), rgba(24,160,251,.90));
+      color:white;
+    }
+    .danger{
+      border-color: rgba(220,38,38,.25);
+      color: rgb(220,38,38);
+      background: rgba(255,255,255,.85);
+    }
+    .ghost{
+      background: transparent;
+      box-shadow:none;
+    }
+
+    /* Chat */
+    .chatTop{
+      display:flex; justify-content:space-between; align-items:center;
+      gap:10px;
+    }
+    .badges{
+      display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+    }
+    .badge{
+      font-size:11px;
+      padding:7px 10px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.72);
+      color:var(--muted);
+      display:inline-flex; gap:8px; align-items:center;
+    }
+    .badge strong{ color:var(--text); font-weight:700; }
+    .switchFlag{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--warn);
+      box-shadow: 0 0 0 4px rgba(245,158,11,.10);
+    }
+
+    .messages{
+      height: 410px;
+      overflow:auto;
+      padding: 14px 16px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      background: rgba(255,255,255,.35);
+    }
+    .msg{
+      max-width: 92%;
+      padding: 11px 12px;
+      border-radius: 16px;
+      border:1px solid var(--line);
+      box-shadow: var(--shadow2);
+      line-height:1.35;
+      font-size:13px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .me{
+      margin-left:auto;
+      background: rgba(255,255,255,.92);
+    }
+    .ai{
+      margin-right:auto;
+      background: rgba(255,255,255,.78);
+      border-color: rgba(109,94,252,.22);
+    }
+    .metaLine{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:12px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .composer{
+      padding: 14px 16px 16px;
+      border-top:1px solid var(--line);
+      background: rgba(255,255,255,.55);
+    }
+    .composerRow{
+      display:flex; gap:10px; align-items:flex-end;
+    }
+    .composerRow textarea{
+      min-height:56px;
+      max-height:140px;
+      resize:vertical;
+    }
+
+    .panel{
+      padding: 12px 16px 16px;
+      border-top:1px solid var(--line);
+      background: rgba(255,255,255,.55);
+    }
+    .actionsList{
+      margin:10px 0 0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:8px;
+    }
+    .actionsList li{
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.75);
+      font-size:13px;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .check{
+      width:18px; height:18px; border-radius:6px;
+      border:1px solid rgba(22,163,74,.35);
+      background: rgba(22,163,74,.10);
+      flex:0 0 auto;
+      margin-top:1px;
+    }
+
+    .status{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:10px;
+    }
+
+    .divider{
+      height:1px; background:var(--line); margin:14px 0;
+    }
+
+    .audioRow{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+      margin-top:10px;
+    }
+    audio{ width: 100%; margin-top:10px; }
+
+    .smallNote{
+      font-size:11px;
+      color:var(--muted);
+      margin-top:8px;
+      line-height:1.4;
+    }
+
+    .kbd{
+      font-size:11px;
+      color:var(--muted);
+      border:1px solid var(--line);
+      padding:3px 6px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.7);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="orb" aria-hidden="true"></div>
+        <h1>
+          Mentorra
+          <small>Boardroom — Voice Mentor Demo</small>
+        </h1>
+      </div>
+
+      <div class="topActions">
+        <div class="pill"><span class="dot"></span><span id="apiStatus">API: not checked</span></div>
+        <button class="ghost" id="btnPing" title="Quick API check">Check API</button>
+        <button class="ghost" id="btnReset">Reset Session</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Left: Profile + Controls -->
+      <section class="card">
+        <div class="cardHeader">
+          <h2>Founder Context</h2>
+          <p>Optional, but improves mentor routing. Keep it lightweight.</p>
+        </div>
+        <div class="cardBody">
+          <div class="row">
+            <div>
+              <label for="industry">Industry</label>
+              <input id="industry" placeholder="e.g., EdTech, FinTech, Creator tools"/>
+            </div>
+            <div>
+              <label for="stage">Stage</label>
+              <select id="stage">
+                <option value="">Select…</option>
+                <option>Idea</option>
+                <option>MVP</option>
+                <option>Early traction</option>
+                <option>Seed</option>
+                <option>Series A+</option>
+              </select>
+            </div>
+          </div>
+
+          <label for="challenges">Key challenges (comma-separated)</label>
+          <input id="challenges" placeholder="e.g., pricing, activation, outbound, hiring"/>
+
+          <div class="divider"></div>
+
+          <label for="activeTrack">Active mentor track</label>
+          <select id="activeTrack">
+            <option value="">(auto)</option>
+            <option>Product</option>
+            <option>Sales</option>
+            <option>Fundraising</option>
+            <option>Growth</option>
+            <option>Leadership</option>
+            <option>Hiring</option>
+            <option>Ops</option>
+          </select>
+
+          <label for="memoryContext">Memory context (optional)</label>
+          <textarea id="memoryContext" placeholder="Short notes that persist across turns…"></textarea>
+          <div class="smallNote">
+            Tip: keep memory compact (a few lines). The backend returns <b>memory_update</b> after each turn — you can store it here.
+          </div>
+
+          <div class="btnRow">
+            <button class="primary" id="btnSendProfile">Apply Context</button>
+            <button class="danger" id="btnClearMemory">Clear Memory</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="cardHeader" style="padding:0; border:0; background:transparent;">
+            <h2 style="margin:0; font-size:13px;">Voice Mode</h2>
+            <p style="margin:6px 0 0; font-size:12px;">Record → transcribe → mentor → speak.</p>
+          </div>
+
+          <div class="audioRow">
+            <button id="btnRecord">Start Recording</button>
+            <button id="btnStop" disabled>Stop</button>
+            <button id="btnSendAudio" disabled class="primary">Send Audio</button>
+            <button id="btnSpeakLast" disabled>Speak Last Reply</button>
+          </div>
+
+          <label for="ttsVoice">ElevenLabs voice_id</label>
+          <input id="ttsVoice" value="JBFqnCBsd6RMkjVDRZzb" />
+          <label for="ttsModel">ElevenLabs model_id</label>
+          <input id="ttsModel" value="eleven_monolingual_v1" />
+
+          <audio id="audioPlayer" controls></audio>
+          <div class="status" id="voiceStatus">Voice: idle</div>
+        </div>
+      </section>
+
+      <!-- Right: Chat -->
+      <section class="card">
+        <div class="cardHeader">
+          <div class="chatTop">
+            <div>
+              <h2>Mentor Boardroom</h2>
+              <p>Ask a question, get routed to the best mentor track, with actions for this week.</p>
+            </div>
+            <div class="badges">
+              <div class="badge"><span>Track:</span> <strong id="badgeTrack">—</strong></div>
+              <div class="badge"><span>Switched:</span> <span id="badgeSwitched">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="messages" id="messages"></div>
+
+        <div class="composer">
+          <div class="composerRow">
+            <textarea id="userMessage" placeholder="Type your message… (Shift+Enter for newline)"></textarea>
+            <button class="primary" id="btnSend">Send</button>
+          </div>
+          <div class="metaLine">
+            <span class="kbd">Enter</span> send • <span class="kbd">Shift</span>+<span class="kbd">Enter</span> newline
+            <span id="chatStatus" style="margin-left:auto;">Ready</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <h2 style="margin:0; font-size:13px;">Next Actions</h2>
+            <button class="ghost" id="btnCopyActions">Copy</button>
+          </div>
+          <ul class="actionsList" id="actionsList"></ul>
+          <div class="status" id="hintLine"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+<script>
+  // =========================
+  // Config
+  // =========================
+  const API_BASE = ""; // e.g. "http://localhost:8000" if needed
+
+  // =========================
+  // State
+  // =========================
+  let session = {
+    founder_profile: { industry: null, stage: null, key_challenges: [] },
+    active_mentor_track: null,
+    memory_context: ""
+  };
+
+  let lastMentorReplyText = "";
+  let lastActions = [];
+  let recorder = null;
+  let recordedChunks = [];
+  let recordedBlob = null;
+
+  // =========================
+  // DOM helpers
+  // =========================
+  const $ = (id) => document.getElementById(id);
+
+  function addMessage(role, text){
+    const el = document.createElement("div");
+    el.className = `msg ${role === "me" ? "me" : "ai"}`;
+    el.textContent = text;
+    $("messages").appendChild(el);
+    $("messages").scrollTop = $("messages").scrollHeight;
+  }
+
+  function setStatus(el, text){
+    el.textContent = text;
+  }
+
+  function setBadges(track, switched){
+    $("badgeTrack").textContent = track || "—";
+    $("badgeSwitched").innerHTML = switched === true
+      ? `<span class="switchFlag" aria-hidden="true"></span> yes`
+      : (switched === false ? "no" : "—");
+  }
+
+  function renderActions(actions){
+    lastActions = Array.isArray(actions) ? actions : [];
+    const list = $("actionsList");
+    list.innerHTML = "";
+
+    if (!lastActions.length){
+      $("hintLine").textContent = "No actions yet — ask a question to get a plan for this week.";
+      return;
+    }
+
+    $("hintLine").textContent = `Generated ${lastActions.length} actions you can do this week.`;
+    lastActions.forEach(a => {
+      const li = document.createElement("li");
+      li.innerHTML = `<span class="check"></span><span>${escapeHtml(a)}</span>`;
+      list.appendChild(li);
+    });
+  }
+
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function readProfileUI(){
+    const industry = $("industry").value.trim() || null;
+    const stage = $("stage").value || null;
+
+    const challengesRaw = $("challenges").value.trim();
+    const key_challenges = challengesRaw
+      ? challengesRaw.split(",").map(x => x.trim()).filter(Boolean)
+      : [];
+
+    const active = $("activeTrack").value || null;
+    const mem = $("memoryContext").value || "";
+
+    return { industry, stage, key_challenges, active_mentor_track: active, memory_context: mem };
+  }
+
+  function applyProfileUI(){
+    const p = readProfileUI();
+    session.founder_profile = { industry: p.industry, stage: p.stage, key_challenges: p.key_challenges };
+    session.active_mentor_track = p.active_mentor_track;
+    session.memory_context = p.memory_context;
+
+    addMessage("ai", "Context updated. Ask your next question — I’ll route you to the best mentor track.");
+  }
+
+  function resetSession(){
+    session = {
+      founder_profile: { industry: null, stage: null, key_challenges: [] },
+      active_mentor_track: null,
+      memory_context: ""
+    };
+    lastMentorReplyText = "";
+    lastActions = [];
+    recordedChunks = [];
+    recordedBlob = null;
+
+    $("industry").value = "";
+    $("stage").value = "";
+    $("challenges").value = "";
+    $("activeTrack").value = "";
+    $("memoryContext").value = "";
+
+    $("messages").innerHTML = "";
+    renderActions([]);
+    setBadges(null, null);
+    $("btnSpeakLast").disabled = true;
+
+    addMessage("ai", "Session reset. Add founder context (optional) and ask what you need.");
+  }
+
+  // =========================
+  // API calls
+  // =========================
+  async function mentorAssist(user_message){
+    const payload = {
+      user_message,
+      founder_profile: session.founder_profile,
+      active_mentor_track: session.active_mentor_track,
+      memory_context: session.memory_context
+    };
+
+    const res = await fetch(`${API_BASE}/api/mentor-assist`, {
+      method: "POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok){
+      const t = await res.text();
+      throw new Error(`mentor-assist failed (${res.status}): ${t}`);
+    }
+    return await res.json();
+  }
+
+  async function ttsSpeak(text){
+    const voice_id = $("ttsVoice").value.trim() || "JBFqnCBsd6RMkjVDRZzb";
+    const model_id = $("ttsModel").value.trim() || "eleven_monolingual_v1";
+
+    const res = await fetch(`${API_BASE}/api/voice/speak`, {
+      method: "POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify({
+        text,
+        voice_id,
+        model_id,
+        output_format: "mp3_44100_128"
+      })
+    });
+
+    if (!res.ok){
+      const t = await res.text();
+      throw new Error(`TTS failed (${res.status}): ${t}`);
+    }
+
+    // Stream -> Blob
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const player = $("audioPlayer");
+    player.src = url;
+    await player.play().catch(()=>{ /* autoplay might be blocked */ });
+  }
+
+  async function sttTranscribe(blob){
+    const fd = new FormData();
+    fd.append("file", blob, "recording.webm");
+
+    const res = await fetch(`${API_BASE}/api/voice/transcribe`, {
+      method: "POST",
+      body: fd
+    });
+
+    if (!res.ok){
+      const t = await res.text();
+      throw new Error(`STT failed (${res.status}): ${t}`);
+    }
+    return await res.json(); // { text }
+  }
+
+  // =========================
+  // Chat flow
+  // =========================
+  async function sendTextMessage(){
+    const text = $("userMessage").value.trim();
+    if (!text) return;
+
+    $("userMessage").value = "";
+    addMessage("me", text);
+    setStatus($("chatStatus"), "Thinking…");
+
+    try{
+      const data = await mentorAssist(text);
+
+      // Update session stability: keep chosen track + memory update
+      session.active_mentor_track = data.mentor_track || session.active_mentor_track;
+      if (typeof data.memory_update === "string" && data.memory_update.trim()){
+        // You can choose to append rather than replace. For demo: replace with latest compact memory.
+        session.memory_context = data.memory_update;
+        $("memoryContext").value = session.memory_context;
+      }
+
+      setBadges(data.mentor_track, data.switched_track);
+
+      let replyText = data.reply || "";
+      if (data.clarifying_question){
+        replyText += `\n\nQuick question: ${data.clarifying_question}`;
+      }
+
+      lastMentorReplyText = replyText;
+      $("btnSpeakLast").disabled = !lastMentorReplyText;
+
+      addMessage("ai", replyText);
+      renderActions(data.next_actions || []);
+
+      setStatus($("chatStatus"), "Ready");
+    }catch(err){
+      console.error(err);
+      addMessage("ai", `Error: ${err.message}`);
+      setStatus($("chatStatus"), "Error");
+    }
+  }
+
+  // =========================
+  // Voice flow
+  // =========================
+  async function startRecording(){
+    recordedChunks = [];
+    recordedBlob = null;
+    $("btnSendAudio").disabled = true;
+
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    recorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+
+    recorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+    };
+
+    recorder.onstop = () => {
+      recordedBlob = new Blob(recordedChunks, { type: "audio/webm" });
+      $("btnSendAudio").disabled = false;
+      setStatus($("voiceStatus"), "Voice: recorded ✓ (ready to send)");
+      // stop mic tracks
+      stream.getTracks().forEach(t => t.stop());
+    };
+
+    recorder.start();
+    $("btnRecord").disabled = true;
+    $("btnStop").disabled = false;
+    setStatus($("voiceStatus"), "Voice: recording…");
+  }
+
+  function stopRecording(){
+    if (!recorder) return;
+    recorder.stop();
+    $("btnRecord").disabled = false;
+    $("btnStop").disabled = true;
+  }
+
+  async function sendRecordedAudio(){
+    if (!recordedBlob) return;
+
+    try{
+      setStatus($("voiceStatus"), "Voice: transcribing…");
+      const t = await sttTranscribe(recordedBlob);
+      const transcript = (t.text || "").trim();
+      if (!transcript){
+        setStatus($("voiceStatus"), "Voice: no transcript detected");
+        return;
+      }
+
+      addMessage("me", `🎙️ ${transcript}`);
+      setStatus($("voiceStatus"), "Voice: routing mentor…");
+
+      const data = await mentorAssist(transcript);
+
+      session.active_mentor_track = data.mentor_track || session.active_mentor_track;
+      if (typeof data.memory_update === "string" && data.memory_update.trim()){
+        session.memory_context = data.memory_update;
+        $("memoryContext").value = session.memory_context;
+      }
+
+      setBadges(data.mentor_track, data.switched_track);
+
+      let replyText = data.reply || "";
+      if (data.clarifying_question){
+        replyText += `\n\nQuick question: ${data.clarifying_question}`;
+      }
+
+      lastMentorReplyText = replyText;
+      $("btnSpeakLast").disabled = !lastMentorReplyText;
+
+      addMessage("ai", replyText);
+      renderActions(data.next_actions || []);
+
+      setStatus($("voiceStatus"), "Voice: done ✓ (you can speak the reply)");
+    }catch(err){
+      console.error(err);
+      setStatus($("voiceStatus"), `Voice: error — ${err.message}`);
+      addMessage("ai", `Voice error: ${err.message}`);
+    }
+  }
+
+  async function speakLastReply(){
+    if (!lastMentorReplyText) return;
+    try{
+      setStatus($("voiceStatus"), "Voice: speaking…");
+      await ttsSpeak(lastMentorReplyText);
+      setStatus($("voiceStatus"), "Voice: playback ready ✓");
+    }catch(err){
+      console.error(err);
+      setStatus($("voiceStatus"), `Voice: TTS error — ${err.message}`);
+    }
+  }
+
+  async function pingApi(){
+    // Quick ping by calling mentor-assist with a tiny message (or you can create a dedicated /health route later).
+    try{
+      $("apiStatus").textContent = "API: checking…";
+      const data = await mentorAssist("ping");
+      $("apiStatus").textContent = "API: online ✓";
+      setBadges(data.mentor_track, data.switched_track);
+    }catch(e){
+      $("apiStatus").textContent = "API: offline / CORS issue";
+      console.error(e);
+    }
+  }
+
+  // =========================
+  // Events
+  // =========================
+  $("btnSend").addEventListener("click", sendTextMessage);
+
+  $("userMessage").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey){
+      e.preventDefault();
+      sendTextMessage();
+    }
+  });
+
+  $("btnSendProfile").addEventListener("click", applyProfileUI);
+
+  $("btnClearMemory").addEventListener("click", () => {
+    session.memory_context = "";
+    $("memoryContext").value = "";
+    addMessage("ai", "Memory cleared.");
+  });
+
+  $("btnReset").addEventListener("click", resetSession);
+  $("btnPing").addEventListener("click", pingApi);
+
+  $("btnRecord").addEventListener("click", async () => {
+    try{ await startRecording(); }
+    catch(err){
+      console.error(err);
+      setStatus($("voiceStatus"), "Voice: mic permission denied / not available");
+    }
+  });
+
+  $("btnStop").addEventListener("click", stopRecording);
+  $("btnSendAudio").addEventListener("click", sendRecordedAudio);
+  $("btnSpeakLast").addEventListener("click", speakLastReply);
+
+  $("btnCopyActions").addEventListener("click", async () => {
+    const text = lastActions.length ? lastActions.map((a,i)=>`${i+1}. ${a}`).join("\n") : "";
+    if (!text) return;
+    await navigator.clipboard.writeText(text);
+    $("hintLine").textContent = "Copied actions to clipboard ✓";
+    setTimeout(()=> $("hintLine").textContent = `Generated ${lastActions.length} actions you can do this week.`, 1200);
+  });
+
+  // Boot
+  resetSession();
+</script>
+</body>
+</html>
+```
+
+and then following is the back end code in python.
+```import os
+import json
+import io
+from typing import Optional, List, Dict
+
+from fastapi import FastAPI, HTTPException, UploadFile, File
+
+from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+from openai import OpenAI, APIError
+from dotenv import load_dotenv
+
+# ✅ Updated import (NO .client)
+from elevenlabs import ElevenLabs
+
+# Load environment variables
+load_dotenv()
+
+# Verify API Keys exist
+if not os.getenv("OPENAI_API_KEY"):
+    raise ValueError("OPENAI_API_KEY is missing in .env")
+if not os.getenv("ELEVENLABS_API_KEY"):
+    raise ValueError("ELEVENLABS_API_KEY is missing in .env")
+
+app = FastAPI(title="Mentorra Backend")
+
+# Allow CORS for local frontend development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Initialize Clients
+openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+elevenlabs_client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
+
+# --- Data Models ---
+
+class FounderProfile(BaseModel):
+    industry: Optional[str] = None
+    stage: Optional[str] = None
+    key_challenges: List[str] = Field(default_factory=list)
+
+class UserRequest(BaseModel):
+    user_message: str
+    founder_profile: Optional[FounderProfile] = None
+    active_mentor_track: Optional[str] = None
+    memory_context: Optional[str] = ""
+
+class MentorResponse(BaseModel):
+    mentor_track: str
+    switched_track: bool
+    reply: str
+    clarifying_question: Optional[str] = None
+    next_actions: List[str]
+    # ✅ Added to support the new prompt requirement
+    suggested_agents: List[Dict[str, float]] 
+    memory_update: str
+
+class TTSRequest(BaseModel):
+    text: str
+    voice_id: Optional[str] = "JBFqnCBsd6RMkjVDRZzb"  # Default ElevenLabs voice
+    model_id: Optional[str] = "eleven_monolingual_v1"
+    output_format: Optional[str] = "mp3_44100_128"
+
+# --- Toolhouse Agent Logic ---
+
+SYSTEM_PROMPT_TEMPLATE = """
+You are the Mentorra Routing Agent. You act as the brain behind a founder's mentorship experience.
+
+You have access to the following roster of Elite Mentors. You must analyze the user's input to determine which of these specific mentors is best suited to help them based on their current problem, stage, and emotional state.
+
+### MENTOR ROSTER
+
+1. **Vincent Forge — The Impossible Builder**
+   - **Tagline:** Make the impossible inevitable through first principles and relentless execution
+   - **Philosophy:** Most limits are just stacked assumptions. If physics allows it, it can be engineered—aim for 10x and move fast.
+   - **Best for:** Moonshots, first-principles problem solving, rapid iteration, scaling hard systems
+   - **Style:** Direct, intense, impatient with excuses
+   - **Signature question:** ‘What’s the actual constraint here?’
+
+2. **Katerina Catalyst — The Scrappy Disruptor**
+   - **Tagline:** Turn your struggles into your advantage—bootstrap, hustle, believe
+   - **Philosophy:** Great businesses come from personal pain points. Constraints create creativity—start scrappy, sell early, and learn from ‘no.’
+   - **Best for:** Bootstrapping, getting first customers, sales confidence, resilience through rejection
+   - **Style:** Warm, encouraging, real—pushes you without shaming you
+   - **Signature question:** ‘What would make YOU buy this?’
+
+3. **Sophia Architect — The Experience Designer**
+   - **Tagline:** Design experiences people love, not just products they use
+   - **Philosophy:** Features are commodities; experiences create loyalty. Map the full journey and obsess over trust, delight, and story.
+   - **Best for:** UX/customer journey, brand storytelling, trust & safety, differentiation through experience
+   - **Style:** Thoughtful, human-centered, detail-obsessed
+   - **Signature question:** ‘What’s the 11-star version of this?’
+
+4. **Adrian Insight — The Startup Sage**
+   - **Tagline:** Make something people want—everything else is noise
+   - **Philosophy:** Startups fail when they build in isolation. Talk to users, launch early, measure behavior, iterate until PMF.
+   - **Best for:** Pre-PMF clarity, idea validation, pivot decisions, early execution strategy
+   - **Style:** Calm, clear, direct—cuts through hype
+   - **Signature question:** ‘Do people actually want this?’
+
+### INSTRUCTIONS
+
+You will receive:
+- role: The current agent role (Router & Mentor Persona)
+- user_message: A single string from the founder
+- founder_profile: JSON summary of what we know so far
+- active_mentor: Current mentor track id if already selected
+- memory_context: Previous context of the conversation
+
+Primary goals:
+1) **Analyze:** Compare the user's situation against the 4 mentors above. Calculate a confidence score (0.0 to 1.0) for how well EACH mentor fits the current request.
+2) **Select:** Choose the single best mentor track (use the full name, e.g., "Vincent Forge").
+3) **Switching:** Decide whether to switch mentors. Prefer stability unless the user’s intent clearly aligns better with a different mentor's specialty.
+4) **Reply:** Reply AS the selected mentor. Adopt their specific **Style**, **Philosophy**, and **Signature Question** (if applicable).
+5) **Action:** Provide 2–5 next actions that the founder can do immediately (this week).
+6) **Memory:** Update "memory_update" compactly so the next call stays consistent.
+
+### OUTPUT FORMAT
+
+Output must be valid JSON matching this schema exactly:
+{
+  "mentor_track": "string (Name of the selected mentor)",
+  "switched_track": boolean,
+  "reply": "string (in the voice of the selected mentor)",
+  "clarifying_question": "string or null",
+  "next_actions": ["action1", "action2"],
+  "suggested_agents": [{"Agent Name": 0.95}, {"Agent Name": 0.87}],
+  "memory_update": "string summary of new facts"
+}
+
+*Note on suggested_agents:* Include all 4 mentors in the list, sorted by confidence score in descending order.
+"""
+
+@app.post("/api/mentor-assist", response_model=MentorResponse)
+async def mentor_assist(request: UserRequest):
+    try:
+        user_input_context = f"""
+        INPUT DATA:
+        - User Message: \"{request.user_message}\"
+        - Active Mentor Track: {request.active_mentor_track if request.active_mentor_track else "None"}
+        - Founder Profile: {request.founder_profile.model_dump_json() if request.founder_profile else "Unknown"}
+        - Memory Context: {request.memory_context}
+        """
+
+        try:
+            completion = openai_client.chat.completions.create(
+                model="gpt-4-turbo",
+                response_format={"type": "json_object"},
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE},
+                    {"role": "user", "content": user_input_context},
+                ],
+                temperature=0.7,
+            )
+        except APIError:
+            # Fallback to gpt-4o-mini
+            completion = openai_client.chat.completions.create(
+                model="gpt-4o-mini", 
+                response_format={"type": "json_object"},
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE},
+                    {"role": "user", "content": user_input_context},
+                ],
+                temperature=0.7,
+            )
+
+        raw_content = completion.choices[0].message.content
+        data = json.loads(raw_content)
+        return MentorResponse(**data)
+
+    except Exception as e:
+        print(f"Mentor Assist Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# --- Voice Mode Endpoints ---
+
+@app.post("/api/voice/speak")
+async def text_to_speech(request: TTSRequest):
+    """
+    Converts text into audio using ElevenLabs.
+    Streams MP3 audio back to the client.
+    """
+    try:
+        audio_stream = elevenlabs_client.text_to_speech.convert(
+            voice_id=request.voice_id,
+            model_id=request.model_id,
+            text=request.text,
+            output_format=request.output_format,
+        )
+
+        def iterfile():
+            for chunk in audio_stream:
+                if chunk:
+                    yield chunk
+
+        return StreamingResponse(iterfile(), media_type="audio/mpeg")
+
+    except Exception as e:
+        print(f"TTS Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Text-to-speech failed: {str(e)}")
+
+@app.post("/api/voice/transcribe")
+async def speech_to_text(file: UploadFile = File(...)):
+    """
+    Transcribes an uploaded audio file into text using OpenAI Whisper.
+    """
+    try:
+        audio_bytes = await file.read()
+
+        audio_file = io.BytesIO(audio_bytes)
+        audio_file.name = file.filename or "audio.mp3"
+
+        transcript = openai_client.audio.transcriptions.create(
+            model="whisper-1",
+            file=audio_file,
+        )
+
+        return {"text": transcript.text}
+
+    except Exception as e:
+        print(f"STT Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+    ```
+
+
+In the html code can you correct any disrepancies between the endpoints to ensure that the toolhouse agent display text for the front end and that users can send in messages to the backend.

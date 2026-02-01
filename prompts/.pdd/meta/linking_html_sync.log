@@ -1,0 +1,1 @@
+{"timestamp": "2026-01-31T19:08:00.785760", "operation": "generate", "reason": "Manual invocation via CLI", "invocation_mode": "manual", "estimated_cost": 0.0, "confidence": 0.0, "decision_type": "unknown", "success": true, "duration": 183.89245700836182, "actual_cost": 0.20135189999999997, "model": "vertex_ai/gemini-3-pro-preview", "error": null}

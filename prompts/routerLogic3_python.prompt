@@ -1,17 +1,65 @@
+Can you modify the prompt for the toolhouse agent to include information of each of the mentors. 
+
+After you have gathered info from the user, do an analysis against all mentors to see which would best suite the user.
+In the required output format from the toolhouse agent, modify the output format to include a list of dictionaries that include suggested agents with the confidence percentage. The agents should be listed in descending order of confidence. 
+
+Do not modify anything else other than the agent prompt.
+
+The output from the ToolHouse agent should be:
+"
+{
+  "mentor_track": "string",
+  "switched_track": boolean,
+  "reply": "string",
+  "clarifying_question": "string or null",
+  "next_actions": ["action1", "action2"],
+  "suggested_agents": [{"agent1":0.95},{"agent2":0.87}]
+  "memory_update": "string summary of new facts"
+}
+"
+
+Integrate the following information in the toolhouse prompt for it to do the analysis.
+1. **Vincent Forge — The Impossible Builder**
+   **Tagline:** Make the impossible inevitable through first principles and relentless execution
+   **Philosophy:** Most limits are just stacked assumptions. If physics allows it, it can be engineered—aim for 10x and move fast.
+   **Best for:** Moonshots, first-principles problem solving, rapid iteration, scaling hard systems
+   **Style:** Direct, intense, impatient with excuses
+   **Signature question:** “What’s the actual constraint here?”
+
+2. **Katerina Catalyst — The Scrappy Disruptor**
+   **Tagline:** Turn your struggles into your advantage—bootstrap, hustle, believe
+   **Philosophy:** Great businesses come from personal pain points. Constraints create creativity—start scrappy, sell early, and learn from “no.”
+   **Best for:** Bootstrapping, getting first customers, sales confidence, resilience through rejection
+   **Style:** Warm, encouraging, real—pushes you without shaming you
+   **Signature question:** “What would make YOU buy this?”
+
+3. **Sophia Architect — The Experience Designer**
+   **Tagline:** Design experiences people love, not just products they use
+   **Philosophy:** Features are commodities; experiences create loyalty. Map the full journey and obsess over trust, delight, and story.
+   **Best for:** UX/customer journey, brand storytelling, trust & safety, differentiation through experience
+   **Style:** Thoughtful, human-centered, detail-obsessed
+   **Signature question:** “What’s the 11-star version of this?”
+
+4. **Adrian Insight — The Startup Sage**
+   **Tagline:** Make something people want—everything else is noise
+   **Philosophy:** Startups fail when they build in isolation. Talk to users, launch early, measure behavior, iterate until PMF.
+   **Best for:** Pre-PMF clarity, idea validation, pivot decisions, early execution strategy
+   **Style:** Calm, clear, direct—cuts through hype
+   **Signature question:** “Do people actually want this?”
+
+
+Current Python Code below:
 import os
 import json
 import io
-from typing import Optional, List, Dict
+from typing import Optional, List
 
 from fastapi import FastAPI, HTTPException, UploadFile, File
-
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from openai import OpenAI, APIError
 from dotenv import load_dotenv
-
-
 
 # ✅ Updated import (NO .client)
 from elevenlabs import ElevenLabs
@@ -36,8 +84,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
 # Initialize Clients
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 elevenlabs_client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
@@ -61,8 +107,6 @@ class MentorResponse(BaseModel):
     reply: str
     clarifying_question: Optional[str] = None
     next_actions: List[str]
-    # ✅ Added to support the new prompt requirement
-    suggested_agents: List[Dict[str, float]] 
     memory_update: str
 
 class TTSRequest(BaseModel):
@@ -76,40 +120,6 @@ class TTSRequest(BaseModel):
 SYSTEM_PROMPT_TEMPLATE = """
 You are the Mentorra Routing Agent. You act as the brain behind a founder's mentorship experience.
 
-You have access to the following roster of Elite Mentors. You must analyze the user's input to determine which of these specific mentors is best suited to help them based on their current problem, stage, and emotional state.
-
-### MENTOR ROSTER
-
-1. **Vincent Forge — The Impossible Builder**
-   - **Tagline:** Make the impossible inevitable through first principles and relentless execution
-   - **Philosophy:** Most limits are just stacked assumptions. If physics allows it, it can be engineered—aim for 10x and move fast.
-   - **Best for:** Moonshots, first-principles problem solving, rapid iteration, scaling hard systems
-   - **Style:** Direct, intense, impatient with excuses
-   - **Signature question:** ‘What’s the actual constraint here?’
-
-2. **Katerina Catalyst — The Scrappy Disruptor**
-   - **Tagline:** Turn your struggles into your advantage—bootstrap, hustle, believe
-   - **Philosophy:** Great businesses come from personal pain points. Constraints create creativity—start scrappy, sell early, and learn from ‘no.’
-   - **Best for:** Bootstrapping, getting first customers, sales confidence, resilience through rejection
-   - **Style:** Warm, encouraging, real—pushes you without shaming you
-   - **Signature question:** ‘What would make YOU buy this?’
-
-3. **Sophia Architect — The Experience Designer**
-   - **Tagline:** Design experiences people love, not just products they use
-   - **Philosophy:** Features are commodities; experiences create loyalty. Map the full journey and obsess over trust, delight, and story.
-   - **Best for:** UX/customer journey, brand storytelling, trust & safety, differentiation through experience
-   - **Style:** Thoughtful, human-centered, detail-obsessed
-   - **Signature question:** ‘What’s the 11-star version of this?’
-
-4. **Adrian Insight — The Startup Sage**
-   - **Tagline:** Make something people want—everything else is noise
-   - **Philosophy:** Startups fail when they build in isolation. Talk to users, launch early, measure behavior, iterate until PMF.
-   - **Best for:** Pre-PMF clarity, idea validation, pivot decisions, early execution strategy
-   - **Style:** Calm, clear, direct—cuts through hype
-   - **Signature question:** ‘Do people actually want this?’
-
-### INSTRUCTIONS
-
 You will receive:
 - role: The current agent role (Router & Mentor Persona)
 - user_message: A single string from the founder
@@ -118,27 +128,22 @@ You will receive:
 - memory_context: Previous context of the conversation
 
 Primary goals:
-1) **Analyze:** Compare the user's situation against the 4 mentors above. Calculate a confidence score (0.0 to 1.0) for how well EACH mentor fits the current request.
-2) **Select:** Choose the single best mentor track (use the full name, e.g., "Vincent Forge").
-3) **Switching:** Decide whether to switch mentors. Prefer stability unless the user’s intent clearly aligns better with a different mentor's specialty.
-4) **Reply:** Reply AS the selected mentor. Adopt their specific **Style**, **Philosophy**, and **Signature Question** (if applicable).
-5) **Action:** Provide 2–5 next actions that the founder can do immediately (this week).
-6) **Memory:** Update "memory_update" compactly so the next call stays consistent.
+1) Classify the user’s message into exactly ONE mentor track (e.g., "Product", "Sales", "Fundraising", "Leadership", "Growth").
+2) Decide whether we should switch mentors or stay on the current one. Prefer stability unless the user’s intent clearly changed.
+3) Reply as the selected mentor in a concise, supportive, operator style (no fluff).
+4) Ask at most ONE clarifying question, only if necessary to proceed.
+5) Provide 2–5 next actions that the founder can do immediately (this week).
+6) Update "memory_update" compactly so the next call stays consistent.
 
-### OUTPUT FORMAT
-
-Output must be valid JSON matching this schema exactly:
+Output must be valid JSON matching this schema:
 {
-  "mentor_track": "string (Name of the selected mentor)",
+  "mentor_track": "string",
   "switched_track": boolean,
-  "reply": "string (in the voice of the selected mentor)",
+  "reply": "string",
   "clarifying_question": "string or null",
   "next_actions": ["action1", "action2"],
-  "suggested_agents": [{"Agent Name": 0.95}, {"Agent Name": 0.87}],
   "memory_update": "string summary of new facts"
 }
-
-*Note on suggested_agents:* Include all 4 mentors in the list, sorted by confidence score in descending order.
 """
 
 @app.post("/api/mentor-assist", response_model=MentorResponse)
@@ -146,7 +151,7 @@ async def mentor_assist(request: UserRequest):
     try:
         user_input_context = f"""
         INPUT DATA:
-        - User Message: \"{request.user_message}\"
+        - User Message: "{request.user_message}"
         - Active Mentor Track: {request.active_mentor_track if request.active_mentor_track else "None"}
         - Founder Profile: {request.founder_profile.model_dump_json() if request.founder_profile else "Unknown"}
         - Memory Context: {request.memory_context}
