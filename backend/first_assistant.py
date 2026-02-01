@@ -6,8 +6,8 @@ from typing import Optional, List
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from openai import OpenAI
+from pydantic import BaseModel, Field
+from openai import OpenAI, APIError
 from dotenv import load_dotenv
 
 # ✅ Updated import (NO .client)
@@ -42,7 +42,7 @@ elevenlabs_client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
 class FounderProfile(BaseModel):
     industry: Optional[str] = None
     stage: Optional[str] = None
-    key_challenges: Optional[List[str]] = []
+    key_challenges: List[str] = Field(default_factory=list)
 
 class UserRequest(BaseModel):
     user_message: str
@@ -106,15 +106,27 @@ async def mentor_assist(request: UserRequest):
         - Memory Context: {request.memory_context}
         """
 
-        completion = openai_client.chat.completions.create(
-            model="gpt-4-turbo",
-            response_format={"type": "json_object"},
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE},
-                {"role": "user", "content": user_input_context},
-            ],
-            temperature=0.7,
-        )
+        try:
+            completion = openai_client.chat.completions.create(
+                model="gpt-4-turbo",
+                response_format={"type": "json_object"},
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE},
+                    {"role": "user", "content": user_input_context},
+                ],
+                temperature=0.7,
+            )
+        except APIError:
+            # Fallback to gpt-4o-mini
+            completion = openai_client.chat.completions.create(
+                model="gpt-4o-mini", 
+                response_format={"type": "json_object"},
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE},
+                    {"role": "user", "content": user_input_context},
+                ],
+                temperature=0.7,
+            )
 
         raw_content = completion.choices[0].message.content
         data = json.loads(raw_content)
