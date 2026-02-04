@@ -101,7 +101,7 @@ This **Proof Pack** is injected into synthesis so plans reflect real market cond
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** Next.js (App Router), React, plain CSS
+- **Frontend:** Next.js (App Router), HTML, plain CSS
 - **Backend:** Node.js API routes
 - **AI Models:** LLM-based (router, mentors, synthesis)
 - **Web Retrieval:** Rtrvr.ai
