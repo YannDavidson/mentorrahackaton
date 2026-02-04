@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mentorra — Demo</title>
+  <title>Mentorra - Demo</title>
   <meta name="description" content="Mentorra demo — voice mentors that help you build, decide, and ship." />
   <style>
     :root{
@@ -149,25 +149,13 @@
     .btn.primary:hover{ box-shadow: 0 22px 44px rgba(168,85,247,.22); }
 
     /* ===== HERO (PRO / EXECUTIVE) ===== */
-    .hero{
-      padding: 112px 0 84px;
-    }
-    .hero-center{
-      max-width: 880px;
-      margin: 0 auto;
-      text-align: center;
-    }
+    .hero{ padding: 112px 0 84px; }
+    .hero-center{ max-width: 880px; margin: 0 auto; text-align: center; }
     .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.68);
-      color: rgba(17,24,39,.78);
-      font-size: 13px;
-      justify-content:center;
+      display:inline-flex; align-items:center; gap:10px;
+      padding: 8px 12px; border-radius: 999px;
+      border: 1px solid var(--line); background: rgba(255,255,255,.68);
+      color: rgba(17,24,39,.78); font-size: 13px; justify-content:center;
       margin-bottom: 10px;
     }
     .dot{
@@ -229,114 +217,6 @@
       font-size: 14px;
       line-height: 1.5;
       max-width: 68ch;
-    }
-
-    /* Mentor Cards (static grid) */
-    .mentor-static{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-    }
-    .mentor-card{
-      width:100%;
-      border-radius: 24px;
-      border: 1px solid rgba(15,23,42,.10);
-      background: rgba(255,255,255,.86);
-      overflow:hidden;
-      box-shadow: 0 18px 44px rgba(0,0,0,.07);
-      position: relative;
-      transition: transform .18s ease, box-shadow .18s ease;
-    }
-    .mentor-card:hover{
-      transform: translateY(-2px);
-      box-shadow: 0 26px 60px rgba(0,0,0,.10);
-    }
-    .mentor-media{
-      height: 210px;
-      position: relative;
-      overflow:hidden;
-      background: rgba(12,12,18,.94);
-    }
-    .mentor-media img{
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      display:block;
-      transform: scale(1.03);
-      filter: saturate(1.05) contrast(1.05);
-    }
-    .mentor-media::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(680px 260px at 10% 10%, rgba(59,130,246,.26), transparent 60%),
-        radial-gradient(640px 260px at 90% 20%, rgba(168,85,247,.20), transparent 62%),
-        linear-gradient(to top, rgba(0,0,0,.64), rgba(0,0,0,.04) 62%);
-      pointer-events:none;
-    }
-    .mentor-badge{
-      position:absolute;
-      left: 14px;
-      bottom: 14px;
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      color: rgba(255,255,255,.92);
-      z-index: 2;
-    }
-    .mentor-avatar{
-      width: 44px; height: 44px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.20);
-      background: rgba(255,255,255,.10);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 12px 26px rgba(0,0,0,.22);
-      display:grid;
-      place-items:center;
-      font-weight: 820;
-      letter-spacing:-0.02em;
-    }
-    .mentor-badge b{
-      display:block;
-      font-size: 16px;
-      letter-spacing:-0.02em;
-    }
-    .mentor-badge span{
-      display:block;
-      font-size: 12.5px;
-      color: rgba(255,255,255,.78);
-    }
-    .mentor-body{
-      padding: 14px 16px 16px;
-      min-height: 170px;
-      display:flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .mentor-quote{
-      margin: 0;
-      color: rgba(17,24,39,.76);
-      font-size: 13.7px;
-      line-height: 1.55;
-    }
-    .mentor-meta{
-      margin-top: 12px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .mentor-tags{ display:flex; gap: 8px; flex-wrap: wrap; }
-    .mtag{
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(15,23,42,.10);
-      background: rgba(255,255,255,.78);
-      color: rgba(17,24,39,.72);
-      white-space: nowrap;
     }
 
     /* Video + resources */
@@ -414,8 +294,6 @@
       .grid{ grid-template-columns: 1fr; }
       .cta{ min-width:auto; }
       .nav-links{ display:none; }
-      .mentor-static{ grid-template-columns: 1fr; }
-      .mentor-media{ height: 200px; }
       .hero{ padding: 92px 0 66px; }
     }
   </style>
@@ -434,16 +312,15 @@
         </div>
 
         <nav class="nav-links" aria-label="Primary">
-          <a href="#mentors">Mentors</a>
           <a href="#demo">Demo Video</a>
           <a href="#resources">Resources</a>
         </nav>
 
         <div class="cta">
-          <a class="btn" id="githubLink" href="https://github.com/YOUR_ORG/YOUR_REPO" target="_blank" rel="noreferrer">
+          <a class="btn" id="githubLink" href="https://github.com/YannDavidson/mentorrahackaton" target="_blank" rel="noreferrer">
             GitHub
           </a>
-          <a href="/demo/" class="btn primary">Try the Demo</a>
+          <a href="/Demo/" class="btn primary">Try the Demo</a>
         </div>
       </div>
     </div>
@@ -470,7 +347,7 @@
         </p>
 
         <div class="hero-actions">
-          <a href="/demo/" class="btn primary">Try the Demo</a>
+          <a href="/Demo/" class="btn primary">Try the Demo</a>
           <a href="#demo" class="btn">Watch Demo</a>
         </div>
 
@@ -483,121 +360,12 @@
       </div>
     </section>
 
-    <!-- MENTOR SHOWCASE (STATIC) -->
-    <section class="section" id="mentors">
-      <div class="section-head">
-        <div>
-          <h2>Mentor Showcase</h2>
-          <p class="hint">Premium mentor cards (static). Update names, roles, and photos as your roster evolves.</p>
-        </div>
-        <a class="btn" href="#resources">Pitch Deck →</a>
-      </div>
-
-      <div class="mentor-static" aria-label="Mentor cards">
-        <!-- Adrian Insight -->
-        <article class="mentor-card">
-          <div class="mentor-media">
-            <img
-              alt="Adrian Insight — The Startup Sage"
-              src="https://source.unsplash.com/1200x900/?man,executive,portrait,suit"
-              loading="lazy"
-            />
-            <div class="mentor-badge">
-              <div class="mentor-avatar">A</div>
-              <div>
-                <b>Adrian Insight</b>
-                <span>The Startup Sage</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="mentor-body">
-            <p class="mentor-quote">
-              “Bring me your chaos. I’ll turn it into a clear thesis, a plan, and the next two moves that matter.”
-            </p>
-            <div class="mentor-meta">
-              <div class="mentor-tags">
-                <span class="mtag">Strategy</span>
-                <span class="mtag">Clarity</span>
-                <span class="mtag">Decision-making</span>
-              </div>
-              <a href="/demo/" class="btn primary">Try the Demo</a>
-            </div>
-          </div>
-        </article>
-
-        <!-- Katerina Catalyst -->
-        <article class="mentor-card">
-          <div class="mentor-media">
-            <img
-              alt="Katerina Catalyst — The Scrappy Disruptor"
-              src="https://source.unsplash.com/1200x900/?woman,founder,portrait,creative"
-              loading="lazy"
-            />
-            <div class="mentor-badge">
-              <div class="mentor-avatar">K</div>
-              <div>
-                <b>Katerina Catalyst</b>
-                <span>The Scrappy Disruptor</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="mentor-body">
-            <p class="mentor-quote">
-              “Ship fast. Learn faster. We’ll cut the fluff, test the market, and win with momentum.”
-            </p>
-            <div class="mentor-meta">
-              <div class="mentor-tags">
-                <span class="mtag">MVP</span>
-                <span class="mtag">Velocity</span>
-                <span class="mtag">Grit</span>
-              </div>
-              <a href="/demo/" class="btn primary">Try the Demo</a>
-            </div>
-          </div>
-        </article>
-
-        <!-- VINCENT FORGE -->
-        <article class="mentor-card">
-          <div class="mentor-media">
-            <img
-              alt="VINCENT FORGE — The Impossible Builder"
-              src="https://source.unsplash.com/1200x900/?man,engineer,portrait,studio"
-              loading="lazy"
-            />
-            <div class="mentor-badge">
-              <div class="mentor-avatar">V</div>
-              <div>
-                <b>VINCENT FORGE</b>
-                <span>The Impossible Builder</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="mentor-body">
-            <p class="mentor-quote">
-              “If it sounds impossible, good. We’ll design the system, break it into parts, and build it anyway.”
-            </p>
-            <div class="mentor-meta">
-              <div class="mentor-tags">
-                <span class="mtag">Architecture</span>
-                <span class="mtag">Execution</span>
-                <span class="mtag">Scale</span>
-              </div>
-              <a href="/demo/" class="btn primary">Try the Demo</a>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <!-- VIDEO + RESOURCES -->
+    <!-- DEMO VIDEO + RESOURCES -->
     <section class="section" id="demo">
       <div class="section-head">
         <div>
           <h2>Demo Video</h2>
-          <p class="hint">Drop your YouTube link and this becomes the centerpiece for investors and teammates.</p>
+          <p class="hint">Watch the Mentorra walkthrough.</p>
         </div>
       </div>
 
@@ -606,14 +374,14 @@
           <iframe
             class="video"
             id="youtubeEmbed"
-            src="https://www.youtube.com/embed/VIDEO_ID_HERE"
+            src="https://www.youtube.com/embed/JVLMC7Upe6Q"
             title="Mentorra Demo Video"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowfullscreen
           ></iframe>
           <div class="video-note">
-            <span>Tip: replace <b>VIDEO_ID_HERE</b> with your real YouTube ID.</span>
-            <button class="btn" id="copyVideoTip">Copy tip</button>
+            <span>Live demo video loaded.</span>
+            <button class="btn" id="copyVideoTip">Copy link</button>
           </div>
         </div>
 
@@ -624,7 +392,7 @@
           </div>
 
           <p style="margin:0;color:rgba(17,24,39,.70);font-size:13px;line-height:1.55;">
-            Keep everything in one place: repo, deck, docs. Update links when ready.
+            Everything in one place: repo, deck, docs. Update links when ready.
           </p>
 
           <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
@@ -634,14 +402,14 @@
             <a class="btn" id="docsLink" href="https://YOUR_DOCS_LINK_HERE" target="_blank" rel="noreferrer">
               Docs / README
             </a>
-            <a class="btn" id="contactLink" href="mailto:hello@mentorra.ai">
+            <a class="btn" id="contactLink" href="mailto:hello@mentorra.xyz">
               Contact
             </a>
           </div>
 
           <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
-            <a href="/demo/" class="btn primary">Try the Demo</a>
-            <a class="btn" href="#mentors">Browse mentors</a>
+            <a href="/Demo/" class="btn primary">Try the Demo</a>
+            <a class="btn" href="https://github.com/YannDavidson/mentorrahackaton" target="_blank" rel="noreferrer">View on GitHub</a>
           </div>
 
           <div style="margin-top:16px; padding:12px 12px; border-radius:16px; border:1px solid var(--line); background: rgba(255,255,255,.60); color: rgba(17,24,39,.74); font-size:13px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
@@ -654,31 +422,33 @@
 
     <footer>
       <div class="foot">
-        <div>© <span id="year"></span> Mentorra. Built for fast demos.</div>
+        <div>© <span id="year"></span> Mentorra. World-class mentorship, on demand. All rights reserved.</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <a href="#mentors">Mentors</a>
           <a href="#demo">Demo</a>
           <a href="#resources">Resources</a>
-          <a href="https://github.com/YOUR_ORG/YOUR_REPO" target="_blank" rel="noreferrer">GitHub</a>
+          <a href="https://github.com/YannDavidson/mentorrahackaton" target="_blank" rel="noreferrer">GitHub</a>
         </div>
       </div>
     </footer>
 
   </main>
 
+  <!-- ✅ Single ElevenLabs ConvAI widget (popup / launcher) -->
+  <elevenlabs-convai agent-id="agent_1701kgb25h08et5rmczn7zd991v5"></elevenlabs-convai>
+  <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
     document.getElementById("copyVideoTip").addEventListener("click", async () => {
-      const tip = "Replace iframe src with: https://www.youtube.com/embed/<YOUR_VIDEO_ID>";
+      const link = "https://youtu.be/JVLMC7Upe6Q";
       try{
-        await navigator.clipboard.writeText(tip);
-        alert("Copied: " + tip);
+        await navigator.clipboard.writeText(link);
+        alert("Copied: " + link);
       } catch {
-        alert(tip);
+        alert(link);
       }
     });
   </script>
 </body>
 </html>
-
