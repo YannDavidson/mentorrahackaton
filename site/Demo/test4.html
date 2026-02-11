@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mentorra — AI Founder Boardroom</title>
+
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --text: #111111;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --soft: #fafafa;
+      --accent: #111111;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .page {
+      max-width: 1080px;
+      width: 100%;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 26px;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+      background: #f1f5f9;
+      padding: 6px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 32px;
+      letter-spacing: -0.02em;
+      margin: 0 0 12px;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 760px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* --- Mentor Grid --- */
+    .mentor-grid-wrap {
+      margin-top: 28px;
+    }
+
+    .mentor-grid-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 12px;
+      padding: 0 2px;
+      flex-wrap: wrap;
+    }
+
+    .mentor-grid-title {
+      font-size: 14px;
+      font-weight: 900;
+      color: #374151;
+      margin: 0;
+    }
+
+    .mentor-grid-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* PRIMARY grid (first 4 always visible) */
+    .mentor-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    /* Flip card scene */
+    .flip {
+      perspective: 1200px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .flip-inner {
+      position: relative;
+      width: 100%;
+      min-height: 380px;
+      transform-style: preserve-3d;
+      transition: transform 650ms cubic-bezier(.2,.8,.2,1);
+      border-radius: 18px;
+    }
+
+    .flip:hover .flip-inner,
+    .flip:focus-within .flip-inner {
+      transform: rotateY(180deg);
+    }
+
+    .flip-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: var(--soft);
+      overflow: hidden;
+      backface-visibility: hidden;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 10px;
+    }
+
+    .flip-front { padding: 14px; }
+    .flip-back  { transform: rotateY(180deg); padding: 14px 14px 18px; background: #ffffff; }
+
+    .mentor-photo {
+      width: 100%;
+      height: 170px;
+      border-radius: 14px;
+      object-fit: cover;
+      background: #e9eef5;
+      border: 1px solid var(--border);
+    }
+
+    .mentor-name {
+      margin: 12px 0 4px;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+    }
+
+    .mentor-archetype {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+
+    .mentor-tagline {
+      margin: 8px 0 12px;
+      font-size: 13px;
+      color: #111;
+      line-height: 1.35;
+    }
+
+    .mentor-cta {
+      margin-top: auto;
+      padding-top: 10px;
+    }
+
+    .select-btn {
+      appearance: none;
+      border: 1px solid #cfcfcf;
+      background: #fff;
+      color: #111;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 900;
+      border-radius: 12px;
+      cursor: pointer;
+      width: 100%;
+      transition: transform 120ms ease, opacity 120ms ease, background 120ms ease, border-color 120ms ease;
+    }
+    .select-btn:hover { transform: translateY(-1px); }
+    .select-btn:active { transform: translateY(0px); opacity: 0.9; }
+
+    .flip.selected .flip-face { border-color: #111; }
+    .flip.selected .select-btn { border-color: #111; background: #111; color: #fff; }
+
+    .back-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .back-name { font-size: 14px; font-weight: 900; margin: 0; }
+    .back-chip {
+      font-size: 11px;
+      font-weight: 900;
+      color: #374151;
+      background: #f1f5f9;
+      border: 1px solid #e5e7eb;
+      padding: 5px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .back-tagline { margin: 0 0 10px; font-size: 12.5px; color: #111; line-height: 1.35; }
+    .back-philosophy { margin: 0; font-size: 12.5px; line-height: 1.45; color: #374151; }
+    .back-philosophy strong { color: #111; }
+
+    /* --- Explore More Mentors CTA --- */
+    .more-wrap {
+      margin: 18px 0 4px;
+      display: flex;
+      justify-content: center;
+    }
+    .more-btn {
+      appearance: none;
+      border: 1px solid #cfcfcf;
+      background: #fff;
+      color: #111;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 900;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 120ms ease, opacity 120ms ease, background 120ms ease, border-color 120ms ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .more-btn:hover { transform: translateY(-1px); }
+    .more-btn:active { transform: translateY(0px); opacity: 0.9; }
+    .chev {
+      display: inline-block;
+      transition: transform 200ms ease;
+      font-weight: 900;
+    }
+    .more-btn[aria-expanded="true"] .chev { transform: rotate(180deg); }
+
+    /* --- Expandable "More mentors" panel (drop-down dashboard) --- */
+    .more-panel {
+      margin-top: 12px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: #fff;
+      overflow: hidden;
+      box-shadow: 0 12px 26px rgba(0,0,0,0.06);
+
+      /* animation */
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-6px);
+      transition: max-height 420ms cubic-bezier(.2,.8,.2,1), opacity 240ms ease, transform 240ms ease;
+    }
+    .more-panel.open {
+      max-height: 1800px; /* large enough to fit grid */
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .more-panel-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      background: #fbfbfc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .more-panel-title {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 900;
+      color: #374151;
+    }
+    .more-panel-sub {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .more-panel-body {
+      padding: 14px;
+    }
+
+    .mentor-grid.more {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    /* --- Boardroom Widget --- */
+    .agent-wrap {
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .agent-card {
+      width: 100%;
+      max-width: 760px;
+      padding: 22px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: #fafafa;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.04);
+    }
+
+    .agent-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .agent-title {
+      font-size: 14px;
+      font-weight: 900;
+      color: #374151;
+      margin: 0;
+    }
+
+    .selected-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 900;
+      color: #374151;
+      background: #fff;
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      border-radius: 999px;
+    }
+
+    .agent-subtitle {
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--muted);
+      margin: 0 0 14px;
+      line-height: 1.4;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 10px 0 14px;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid #cfcfcf;
+      background: #fff;
+      color: #111;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 900;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 120ms ease, opacity 120ms ease, background 120ms ease, border-color 120ms ease;
+      min-width: 150px;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0px); opacity: 0.9; }
+
+    .btn.primary {
+      border-color: #111;
+      background: #111;
+      color: #fff;
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 10px 0 14px;
+    }
+
+    .footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      padding-bottom: 24px;
+    }
+
+    .footer span {
+      display: inline-block;
+      margin: 0 6px;
+    }
+
+    .bottom-space { height: 26px; }
+
+    /* Responsive */
+    @media (max-width: 980px) {
+      .mentor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mentor-grid.more { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .flip-inner { min-height: 370px; }
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 26px; }
+      .card { padding: 28px 20px; }
+      .mentor-grid { grid-template-columns: 1fr; }
+      .mentor-grid.more { grid-template-columns: 1fr; }
+      .flip-inner { min-height: 420px; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <section class="card">
+      <header class="header">
+        <div class="badge">AI Founder Boardroom</div>
+        <h1>Talk to Your Mentor</h1>
+        <p class="subtitle">
+          Mentorra gives you instant access to a private AI boardroom.
+          Start with one mentor for fast clarity, or escalate to multiple mentors for complex decisions.
+          Voice-first. Private. Focused on execution.
+        </p>
+      </header>
+
+      <section class="mentor-grid-wrap" aria-label="Mentor Boardroom">
+        <div class="mentor-grid-head">
+          <p class="mentor-grid-title">Choose mentors to join the boardroom</p>
+          <p class="mentor-grid-hint">Hover to flip • Tap on mobile • Click to select</p>
+        </div>
+
+        <!-- Visible mentors (first 4) -->
+        <div class="mentor-grid" id="primaryGrid">
+          <!-- Vincent -->
+          <div class="flip" tabindex="0" data-id="vincent" data-name="Vincent Forge">
+            <div class="flip-inner">
+              <div class="flip-face flip-front">
+                <img class="mentor-photo" src="https://mentorra.xyz/Mentors/vincent-forge.png" alt="Vincent Forge portrait" />
+                <div class="mentor-name">Vincent Forge</div>
+                <div class="mentor-archetype">The Impossible Builder</div>
+                <div class="mentor-tagline">“Make the impossible inevitable through first principles and relentless execution.”</div>
+                <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+              </div>
+              <div class="flip-face flip-back">
+                <div class="back-title"><h3 class="back-name">Vincent Forge</h3><span class="back-chip">First Principles</span></div>
+                <p class="back-tagline"><strong>Tagline:</strong> Make the impossible inevitable through first principles and relentless execution.</p>
+                <p class="back-philosophy"><strong>Core philosophy:</strong> Most “impossible” problems are just stacked assumptions. Break them down to physics, reason from first principles, move with speed, and refuse “can’t be done.” Aim for 10× breakthroughs that matter.</p>
+                <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Adrian -->
+          <div class="flip" tabindex="0" data-id="adrian" data-name="Adrian Insight">
+            <div class="flip-inner">
+              <div class="flip-face flip-front">
+                <img class="mentor-photo" src="https://mentorra.xyz/Mentors/adrian-insight.png" alt="Adrian Insight portrait" />
+                <div class="mentor-name">Adrian Insight</div>
+                <div class="mentor-archetype">The Startup Sage</div>
+                <div class="mentor-tagline">“Make something people want, everything else is noise.”</div>
+                <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+              </div>
+              <div class="flip-face flip-back">
+                <div class="back-title"><h3 class="back-name">Adrian Insight</h3><span class="back-chip">PMF Obsession</span></div>
+                <p class="back-tagline"><strong>Tagline:</strong> Make something people want, everything else is noise.</p>
+                <p class="back-philosophy"><strong>Core philosophy:</strong> Startups fail for one reason: building what nobody wants. The job is PMF before you run out of money. Talk to users obsessively, iterate fast, and ignore premature optimization until the demand is real.</p>
+                <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Katerina -->
+          <div class="flip" tabindex="0" data-id="katerina" data-name="Katerina Catalyst">
+            <div class="flip-inner">
+              <div class="flip-face flip-front">
+                <img class="mentor-photo" src="https://mentorra.xyz/Mentors/katerina-catalyst.png" alt="Katerina Catalyst portrait" />
+                <div class="mentor-name">Katerina Catalyst</div>
+                <div class="mentor-archetype">The Scrappy Disruptor</div>
+                <div class="mentor-tagline">“Turn your struggles into your advantage, bootstrap, hustle, believe.”</div>
+                <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+              </div>
+              <div class="flip-face flip-back">
+                <div class="back-title"><h3 class="back-name">Katerina Catalyst</h3><span class="back-chip">Scrappy Sales</span></div>
+                <p class="back-tagline"><strong>Tagline:</strong> Turn your struggles into your advantage—bootstrap, hustle, believe.</p>
+                <p class="back-philosophy"><strong>Core philosophy:</strong> The best businesses come from personal pain points you’re obsessed with solving. Constraints breed creativity. Being underestimated is leverage. Sales is service. Every “no” is practice for the next “yes.” Think like a customer, not an entrepreneur.</p>
+                <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sophia -->
+          <div class="flip" tabindex="0" data-id="sophia" data-name="Sophia Architect">
+            <div class="flip-inner">
+              <div class="flip-face flip-front">
+                <img class="mentor-photo" src="https://mentorra.xyz/Mentors/sophia-architect.png" alt="Sophia Architect portrait" />
+                <div class="mentor-name">Sophia Architect</div>
+                <div class="mentor-archetype">The Experience Designer</div>
+                <div class="mentor-tagline">“Design experiences people love, not just products they use.”</div>
+                <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+              </div>
+              <div class="flip-face flip-back">
+                <div class="back-title"><h3 class="back-name">Sophia Architect</h3><span class="back-chip">Experience</span></div>
+                <p class="back-tagline"><strong>Tagline:</strong> Design experiences people love, not just products they use.</p>
+                <p class="back-philosophy"><strong>Core philosophy:</strong> Great companies aren’t built on features—they’re built on experiences that create emotional connection. Every touchpoint matters. The details are the product. Obsess over the customer journey end-to-end, and when things get hard, don’t just survive—reinvent.</p>
+                <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Explore more mentors -->
+        <div class="more-wrap">
+          <button class="more-btn" type="button" id="moreMentorsBtn" aria-expanded="false" aria-controls="morePanel">
+            Explore more mentors <span class="chev">▾</span>
+          </button>
+        </div>
+
+        <!-- Hidden dropdown dashboard with additional mentors -->
+        <div class="more-panel" id="morePanel" role="region" aria-label="More mentors">
+          <div class="more-panel-head">
+            <p class="more-panel-title">More mentors</p>
+            <p class="more-panel-sub">Same selection behavior — choose any mentors to add to your boardroom.</p>
+          </div>
+
+          <div class="more-panel-body">
+            <div class="mentor-grid more" id="moreGrid">
+              <!-- Placeholder mentors 5-12 (content can be updated later) -->
+              <!-- 5 -->
+              <div class="flip" tabindex="0" data-id="mentor5" data-name="Mentor Five">
+                <div class="flip-inner">
+                  <div class="flip-face flip-front">
+                    <img class="mentor-photo" src="https://mentorra.xyz/Mentors/vincent-forge.png" alt="Mentor Five portrait" />
+                    <div class="mentor-name">Mentor Five</div>
+                    <div class="mentor-archetype">Placeholder Archetype</div>
+                    <div class="mentor-tagline">“Placeholder tagline — update later.”</div>
+                    <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+                  </div>
+                  <div class="flip-face flip-back">
+                    <div class="back-title"><h3 class="back-name">Mentor Five</h3><span class="back-chip">Placeholder</span></div>
+                    <p class="back-tagline"><strong>Tagline:</strong> Placeholder tagline — update later.</p>
+                    <p class="back-philosophy"><strong>Core philosophy:</strong> Placeholder bio content. Replace with real mentor philosophy, expertise, and style later.</p>
+                    <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 6 -->
+              <div class="flip" tabindex="0" data-id="mentor6" data-name="Mentor Six">
+                <div class="flip-inner">
+                  <div class="flip-face flip-front">
+                    <img class="mentor-photo" src="https://mentorra.xyz/Mentors/adrian-insight.png" alt="Mentor Six portrait" />
+                    <div class="mentor-name">Mentor Six</div>
+                    <div class="mentor-archetype">Placeholder Archetype</div>
+                    <div class="mentor-tagline">“Placeholder tagline — update later.”</div>
+                    <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+                  </div>
+                  <div class="flip-face flip-back">
+                    <div class="back-title"><h3 class="back-name">Mentor Six</h3><span class="back-chip">Placeholder</span></div>
+                    <p class="back-tagline"><strong>Tagline:</strong> Placeholder tagline — update later.</p>
+                    <p class="back-philosophy"><strong>Core philosophy:</strong> Placeholder bio content. Replace with real mentor philosophy, expertise, and style later.</p>
+                    <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 7 -->
+              <div class="flip" tabindex="0" data-id="mentor7" data-name="Mentor Seven">
+                <div class="flip-inner">
+                  <div class="flip-face flip-front">
+                    <img class="mentor-photo" src="https://mentorra.xyz/Mentors/katerina-catalyst.png" alt="Mentor Seven portrait" />
+                    <div class="mentor-name">Mentor Seven</div>
+                    <div class="mentor-archetype">Placeholder Archetype</div>
+                    <div class="mentor-tagline">“Placeholder tagline — update later.”</div>
+                    <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+                  </div>
+                  <div class="flip-face flip-back">
+                    <div class="back-title"><h3 class="back-name">Mentor Seven</h3><span class="back-chip">Placeholder</span></div>
+                    <p class="back-tagline"><strong>Tagline:</strong> Placeholder tagline — update later.</p>
+                    <p class="back-philosophy"><strong>Core philosophy:</strong> Placeholder bio content. Replace with real mentor philosophy, expertise, and style later.</p>
+                    <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 8 -->
+              <div class="flip" tabindex="0" data-id="mentor8" data-name="Mentor Eight">
+                <div class="flip-inner">
+                  <div class="flip-face flip-front">
+                    <img class="mentor-photo" src="https://mentorra.xyz/Mentors/sophia-architect.png" alt="Mentor Eight portrait" />
+                    <div class="mentor-name">Mentor Eight</div>
+                    <div class="mentor-archetype">Placeholder Archetype</div>
+                    <div class="mentor-tagline">“Placeholder tagline — update later.”</div>
+                    <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+                  </div>
+                  <div class="flip-face flip-back">
+                    <div class="back-title"><h3 class="back-name">Mentor Eight</h3><span class="back-chip">Placeholder</span></div>
+                    <p class="back-tagline"><strong>Tagline:</strong> Placeholder tagline — update later.</p>
+                    <p class="back-philosophy"><strong>Core philosophy:</strong> Placeholder bio content. Replace with real mentor philosophy, expertise, and style later.</p>
+                    <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 9 -->
+              <div class="flip" tabindex="0" data-id="mentor9" data-name="Mentor Nine">
+                <div class="flip-inner">
+                  <div class="flip-face flip-front">
+                    <img class="mentor-photo" src="https://mentorra.xyz/Mentors/vincent-forge.png" alt="Mentor Nine portrait" />
+                    <div class="mentor-name">Mentor Nine</div>
+                    <div class="mentor-archetype">Placeholder Archetype</div>
+                    <div class="mentor-tagline">“Placeholder tagline — update later.”</div>
+                    <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+                  </div>
+                  <div class="flip-face flip-back">
+                    <div class="back-title"><h3 class="back-name">Mentor Nine</h3><span class="back-chip">Placeholder</span></div>
+                    <p class="back-tagline"><strong>Tagline:</strong> Placeholder tagline — update later.</p>
+                    <p class="back-philosophy"><strong>Core philosophy:</strong> Placeholder bio content. Replace with real mentor philosophy, expertise, and style later.</p>
+                    <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 10 -->
+              <div class="flip" tabindex="0" data-id="mentor10" data-name="Mentor Ten">
+                <div class="flip-inner">
+                  <div class="flip-face flip-front">
+                    <img class="mentor-photo" src="https://mentorra.xyz/Mentors/adrian-insight.png" alt="Mentor Ten portrait" />
+                    <div class="mentor-name">Mentor Ten</div>
+                    <div class="mentor-archetype">Placeholder Archetype</div>
+                    <div class="mentor-tagline">“Placeholder tagline — update later.”</div>
+                    <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+                  </div>
+                  <div class="flip-face flip-back">
+                    <div class="back-title"><h3 class="back-name">Mentor Ten</h3><span class="back-chip">Placeholder</span></div>
+                    <p class="back-tagline"><strong>Tagline:</strong> Placeholder tagline — update later.</p>
+                    <p class="back-philosophy"><strong>Core philosophy:</strong> Placeholder bio content. Replace with real mentor philosophy, expertise, and style later.</p>
+                    <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 11 -->
+              <div class="flip" tabindex="0" data-id="mentor11" data-name="Mentor Eleven">
+                <div class="flip-inner">
+                  <div class="flip-face flip-front">
+                    <img class="mentor-photo" src="https://mentorra.xyz/Mentors/katerina-catalyst.png" alt="Mentor Eleven portrait" />
+                    <div class="mentor-name">Mentor Eleven</div>
+                    <div class="mentor-archetype">Placeholder Archetype</div>
+                    <div class="mentor-tagline">“Placeholder tagline — update later.”</div>
+                    <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+                  </div>
+                  <div class="flip-face flip-back">
+                    <div class="back-title"><h3 class="back-name">Mentor Eleven</h3><span class="back-chip">Placeholder</span></div>
+                    <p class="back-tagline"><strong>Tagline:</strong> Placeholder tagline — update later.</p>
+                    <p class="back-philosophy"><strong>Core philosophy:</strong> Placeholder bio content. Replace with real mentor philosophy, expertise, and style later.</p>
+                    <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 12 -->
+              <div class="flip" tabindex="0" data-id="mentor12" data-name="Mentor Twelve">
+                <div class="flip-inner">
+                  <div class="flip-face flip-front">
+                    <img class="mentor-photo" src="https://mentorra.xyz/Mentors/sophia-architect.png" alt="Mentor Twelve portrait" />
+                    <div class="mentor-name">Mentor Twelve</div>
+                    <div class="mentor-archetype">Placeholder Archetype</div>
+                    <div class="mentor-tagline">“Placeholder tagline — update later.”</div>
+                    <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+                  </div>
+                  <div class="flip-face flip-back">
+                    <div class="back-title"><h3 class="back-name">Mentor Twelve</h3><span class="back-chip">Placeholder</span></div>
+                    <p class="back-tagline"><strong>Tagline:</strong> Placeholder tagline — update later.</p>
+                    <p class="back-philosophy"><strong>Core philosophy:</strong> Placeholder bio content. Replace with real mentor philosophy, expertise, and style later.</p>
+                    <div class="mentor-cta"><button class="select-btn" type="button">Select Mentor</button></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Boardroom widget -->
+      <div class="agent-wrap" id="boardroom">
+        <div class="agent-card">
+          <div class="agent-top">
+            <p class="agent-title">Your Boardroom is ready</p>
+            <div class="selected-pill">Selected: <span id="selectedCount">0</span></div>
+          </div>
+
+          <p class="agent-subtitle" id="sessionSubtitle">
+            Select one or more mentors above, then start a session.
+          </p>
+
+          <div class="actions">
+            <button class="btn" id="textBtn" type="button" disabled>Text Session</button>
+            <button class="btn primary" id="startBtn" type="button" disabled>Start Session</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Voice boardroom placeholder (single widget for now) -->
+          <elevenlabs-convai agent-id="agent_6101kgb383vpfds9h979hrrg9h0k"></elevenlabs-convai>
+          <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+
+          <p class="agent-subtitle" style="margin-top:12px">
+            Powered by ElevenLabs Agents • Voice-first by default • Privacy-first
+          </p>
+        </div>
+      </div>
+
+      <div class="bottom-space"></div>
+
+      <footer class="footer">
+        <span>🎙 Voice-first by default</span>
+        <span>•</span>
+        <span>🔒 Privacy-first</span>
+        <span>•</span>
+        <span>Powered by ElevenLabs</span>
+        <span>•</span>
+        <span>© 2026 Mentorra. All rights reserved.</span>
+      </footer>
+    </section>
+  </main>
+
+  <script>
+    // Selection state
+    const selected = new Map(); // id -> name
+
+    const selectedCountEl = document.getElementById("selectedCount");
+    const sessionSubtitle = document.getElementById("sessionSubtitle");
+    const startBtn = document.getElementById("startBtn");
+    const textBtn = document.getElementById("textBtn");
+
+    // Toggle + update UI
+    function updateUI() {
+      const n = selected.size;
+      selectedCountEl.textContent = String(n);
+
+      startBtn.disabled = n === 0;
+      textBtn.disabled = n === 0;
+
+      if (n === 0) {
+        sessionSubtitle.textContent = "Select one or more mentors above, then start a session.";
+        return;
+      }
+      const names = Array.from(selected.values());
+      const shown = names.slice(0, 2).join(", ");
+      const tail = n > 2 ? ` +${n - 2} more` : "";
+      sessionSubtitle.innerHTML =
+        `Selected: <strong>${shown}${tail}</strong>. Click <strong>Start Session</strong> for voice or <strong>Text Session</strong> for text.`;
+    }
+
+    function toggleMentor(flipEl) {
+      const id = flipEl.getAttribute("data-id");
+      const name = flipEl.getAttribute("data-name") || id;
+
+      if (selected.has(id)) {
+        selected.delete(id);
+        flipEl.classList.remove("selected");
+        flipEl.querySelectorAll(".select-btn").forEach(b => b.textContent = "Select Mentor");
+      } else {
+        selected.set(id, name);
+        flipEl.classList.add("selected");
+        flipEl.querySelectorAll(".select-btn").forEach(b => b.textContent = "Selected ✓");
+      }
+      updateUI();
+    }
+
+    function bindMentorCards(scope) {
+      const flips = (scope || document).querySelectorAll(".flip");
+
+      flips.forEach(flip => {
+        // Avoid double-binding if panel toggled repeatedly
+        if (flip.dataset.bound === "1") return;
+        flip.dataset.bound = "1";
+
+        flip.addEventListener("click", (e) => {
+          const isBtn = e.target && e.target.classList && e.target.classList.contains("select-btn");
+          if (isBtn || e.currentTarget.contains(e.target)) toggleMentor(flip);
+        });
+
+        flip.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleMentor(flip);
+          }
+        });
+      });
+    }
+
+    bindMentorCards(document);
+
+    function selectedIdsCSV() {
+      return Array.from(selected.keys()).join(",");
+    }
+
+    startBtn.addEventListener("click", () => {
+  const mentors = selectedIdsCSV();
+  if (!mentors) return;
+
+  window.location.href =
+    `https://mentorra.xyz/Boardrooms/?mentors=${encodeURIComponent(mentors)}`;
+});
+
+textBtn.addEventListener("click", () => {
+  const mentors = selectedIdsCSV();
+  if (!mentors) return;
+
+  window.location.href =
+    `https://mentorra.xyz/Boardrooms/?mode=text&mentors=${encodeURIComponent(mentors)}`;
+});
+
+
+    // --- Expand/Collapse "More mentors" panel ---
+    const moreBtn = document.getElementById("moreMentorsBtn");
+    const morePanel = document.getElementById("morePanel");
+
+    function openMore() {
+      morePanel.classList.add("open");
+      moreBtn.setAttribute("aria-expanded", "true");
+      // Ensure event handlers are bound inside panel
+      bindMentorCards(morePanel);
+      // Smooth scroll to panel for nice UX
+      morePanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function closeMore() {
+      morePanel.classList.remove("open");
+      moreBtn.setAttribute("aria-expanded", "false");
+    }
+
+    moreBtn.addEventListener("click", () => {
+      const isOpen = morePanel.classList.contains("open");
+      if (isOpen) closeMore();
+      else openMore();
+    });
+
+    // Close panel with ESC for better UX
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && morePanel.classList.contains("open")) closeMore();
+    });
+
+    updateUI();
+  </script>
+</body>
+</html>

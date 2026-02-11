@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mentorra – Mentor Selection</title>
+  <style>
+    body {
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f6f7f9;
+      margin: 0;
+      padding: 40px;
+      color: #111;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      padding: 48px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+    h1 { font-size: 40px; margin: 0 0 12px; }
+    .subtitle { font-size: 18px; color: #555; margin-bottom: 36px; }
+    .section-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      border: 1.5px solid #e4e6eb;
+      border-radius: 14px;
+      padding: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      background: #fff;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      min-height: 130px;
+    }
+    .card:hover { border-color: #c9ccd4; }
+    .card.selected {
+      border-color: #111;
+      background: #f4f4f5;
+    }
+
+    .avatar {
+      width: 62px;
+      height: 62px;
+      border-radius: 14px;
+      background: #ddd;
+      flex: 0 0 auto;
+      overflow: hidden;
+      border: 1px solid #e4e6eb;
+    }
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .meta { flex: 1; }
+    .name { font-weight: 700; margin: 2px 0 4px; }
+    .role { font-size: 14px; color: #666; margin-bottom: 10px; }
+    .quote { font-size: 14px; color: #333; line-height: 1.35; margin: 0; }
+
+    .check {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      border: 1.5px solid #cfd3dc;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      color: transparent;
+      background: #fff;
+      transition: all 0.2s ease;
+    }
+    .card.selected .check {
+      border-color: #111;
+      background: #111;
+      color: #fff;
+    }
+
+    .footer {
+      margin-top: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #eee;
+      padding-top: 24px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .selected-count {
+      font-size: 14px;
+      color: #555;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pill {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #e4e6eb;
+      background: #fafafa;
+      color: #374151;
+    }
+
+    .actions { display: flex; gap: 12px; }
+    button {
+      padding: 14px 20px;
+      border-radius: 10px;
+      font-size: 15px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .primary { background: #111; color: #fff; }
+    .primary:disabled { background: #ccc; cursor: not-allowed; }
+    .secondary { background: #f0f0f0; color: #111; }
+    .secondary:disabled { background: #e6e6e6; color: #888; cursor: not-allowed; }
+
+    @media (max-width: 640px) {
+      body { padding: 18px; }
+      .container { padding: 22px; }
+      h1 { font-size: 30px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Choose Your Mentors</h1>
+    <div class="subtitle">Select one or more mentors to form your boardroom, then start a session.</div>
+
+    <div class="section-title">Select mentors for your boardroom</div>
+
+    <div class="cards" id="cards">
+      <div class="card" data-id="vincent">
+        <div class="check">✓</div>
+        <div class="avatar">
+          <img src="https://mentorra.xyz/Mentors/vincent-forge.png" alt="Vincent Forge">
+        </div>
+        <div class="meta">
+          <div class="name">Vincent Forge</div>
+          <div class="role">The Impossible Builder</div>
+          <p class="quote">Make the impossible inevitable through first-principles execution.</p>
+        </div>
+      </div>
+
+      <div class="card" data-id="adrian">
+        <div class="check">✓</div>
+        <div class="avatar">
+          <img src="https://mentorra.xyz/Mentors/adrian-insight.png" alt="Adrian Insight">
+        </div>
+        <div class="meta">
+          <div class="name">Adrian Insight</div>
+          <div class="role">The Startup Sage</div>
+          <p class="quote">Make something people want — everything else is noise.</p>
+        </div>
+      </div>
+
+      <div class="card" data-id="katerina">
+        <div class="check">✓</div>
+        <div class="avatar">
+          <img src="https://mentorra.xyz/Mentors/katerina-catalyst.png" alt="Katerina Catalyst">
+        </div>
+        <div class="meta">
+          <div class="name">Katerina Catalyst</div>
+          <div class="role">The Scrappy Disruptor</div>
+          <p class="quote">Turn constraints into momentum — bootstrap, hustle, believe.</p>
+        </div>
+      </div>
+
+      <div class="card" data-id="sophia">
+        <div class="check">✓</div>
+        <div class="avatar">
+          <img src="https://mentorra.xyz/Mentors/sophia-architect.png" alt="Sophia Architect">
+        </div>
+        <div class="meta">
+          <div class="name">Sophia Architect</div>
+          <div class="role">The Experience Designer</div>
+          <p class="quote">Design experiences people love, not just products they use.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="selected-count" id="countWrap">
+        <span id="count">0 mentors selected</span>
+        <span class="pill" id="pill">Boardroom: 0</span>
+      </div>
+
+      <div class="actions">
+        <button class="secondary" id="textBtn" disabled>Text session</button>
+        <button class="primary" id="startBtn" disabled>Start session</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const cards = document.querySelectorAll(".card");
+    const count = document.getElementById("count");
+    const pill = document.getElementById("pill");
+    const startBtn = document.getElementById("startBtn");
+    const textBtn = document.getElementById("textBtn");
+
+    function selectedMentors() {
+      return Array.from(document.querySelectorAll(".card.selected"))
+        .map(el => el.getAttribute("data-id"));
+    }
+
+    function update() {
+      const selected = selectedMentors();
+      const n = selected.length;
+
+      count.textContent = `${n} mentor${n === 1 ? "" : "s"} selected`;
+      pill.textContent = `Boardroom: ${n}`;
+
+      const enabled = n > 0;
+      startBtn.disabled = !enabled;
+      textBtn.disabled = !enabled;
+    }
+
+    cards.forEach(card => {
+      card.addEventListener("click", () => {
+        card.classList.toggle("selected");
+        update();
+      });
+    });
+
+    startBtn.addEventListener("click", () => {
+      const mentors = selectedMentors();
+      const qs = new URLSearchParams({
+        mode: "voice",
+        mentors: mentors.join(",")
+      });
+      window.location.href = `boardroom.html?${qs.toString()}`;
+    });
+
+    textBtn.addEventListener("click", () => {
+      const mentors = selectedMentors();
+      const qs = new URLSearchParams({
+        mode: "text",
+        mentors: mentors.join(",")
+      });
+      window.location.href = `boardroom.html?${qs.toString()}`;
+    });
+
+    update();
+  </script>
+</body>
+</html>

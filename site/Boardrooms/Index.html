@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mentorra — Boardroom</title>
+
+  <style>
+    :root{
+      --bg:#f7f8fa;
+      --card:#ffffff;
+      --text:#111111;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --soft:#fafafa;
+      --accent:#111111;
+    }
+    *{ box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",sans-serif; }
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .page{ max-width:1100px; width:100%; }
+
+    .shell{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:28px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:260px;
+    }
+    .badge{
+      display:inline-block;
+      font-size:12px;
+      font-weight:800;
+      color:#374151;
+      background:#f1f5f9;
+      padding:6px 12px;
+      border-radius:999px;
+      border:1px solid #e5e7eb;
+    }
+    h1{
+      font-size:22px;
+      letter-spacing:-0.02em;
+      margin:0;
+    }
+    .sub{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+      max-width:720px;
+    }
+
+    .mode-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      font-weight:900;
+      color:#374151;
+      background:#fff;
+      border:1px solid var(--border);
+      padding:8px 10px;
+      border-radius:999px;
+      white-space:nowrap;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap:14px;
+      margin-top:16px;
+    }
+
+    .panel{
+      background:var(--soft);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 8px 18px rgba(0,0,0,0.04);
+    }
+
+    .panel-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .panel-title h2{
+      font-size:13px;
+      font-weight:900;
+      color:#374151;
+      margin:0;
+    }
+    .count{
+      font-size:12px;
+      font-weight:900;
+      color:#374151;
+      background:#fff;
+      border:1px solid var(--border);
+      padding:6px 10px;
+      border-radius:999px;
+    }
+
+    .mentor-list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .mentor-chip{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#fff;
+      cursor:default;
+    }
+    .mentor-chip.primary{
+      border-color:#111;
+    }
+    .mentor-photo{
+      width:44px;
+      height:44px;
+      border-radius:12px;
+      object-fit:cover;
+      border:1px solid var(--border);
+      background:#e9eef5;
+      flex:0 0 auto;
+    }
+    .mentor-meta{
+      min-width:0;
+      flex:1;
+    }
+    .mentor-name{
+      margin:0 0 2px;
+      font-weight:900;
+      font-size:13px;
+      letter-spacing:-0.01em;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .mentor-role{
+      margin:0;
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .pill{
+      font-size:11px;
+      font-weight:900;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#f8fafc;
+      color:#374151;
+      white-space:nowrap;
+    }
+    .pill.primary{ border-color:#111; color:#111; background:#fff; }
+
+    .actions{
+      margin-top:12px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      appearance:none;
+      border:1px solid #cfcfcf;
+      background:#fff;
+      color:#111;
+      padding:10px 12px;
+      font-size:13px;
+      font-weight:900;
+      border-radius:12px;
+      cursor:pointer;
+      transition:transform 120ms ease, opacity 120ms ease;
+    }
+    .btn:hover{ transform:translateY(-1px); }
+    .btn:active{ transform:translateY(0); opacity:0.9; }
+    .btn.primary{
+      border-color:#111;
+      background:#111;
+      color:#fff;
+    }
+
+    .main{
+      background:#fafafa;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 8px 18px rgba(0,0,0,0.04);
+      min-height:520px;
+    }
+
+    .main-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+    .main-head h2{
+      margin:0;
+      font-size:14px;
+      font-weight:900;
+      color:#374151;
+    }
+    .main-head p{
+      margin:6px 0 0;
+      font-size:12.5px;
+      color:var(--muted);
+      line-height:1.45;
+      max-width:760px;
+    }
+
+    .widgets{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+      margin-top:10px;
+    }
+    .widget-card{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 8px 18px rgba(0,0,0,0.03);
+    }
+    .widget-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .widget-top .label{
+      font-size:12px;
+      font-weight:900;
+      color:#374151;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .tiny{
+      font-size:11px;
+      font-weight:900;
+      color:#374151;
+      border:1px solid var(--border);
+      background:#f8fafc;
+      padding:5px 10px;
+      border-radius:999px;
+    }
+
+    /* Text mode */
+    .text-box{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+    }
+    .text-row{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      margin-top:10px;
+    }
+    textarea{
+      width:100%;
+      min-height:140px;
+      resize:vertical;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+      font-size:13px;
+      outline:none;
+    }
+    textarea:focus{ border-color:#111; }
+    .hint{
+      margin:10px 0 0;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+
+    .footer{
+      margin-top:18px;
+      text-align:center;
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.5;
+      padding-bottom:8px;
+    }
+
+    .spacer{ height:18px; }
+
+    @media (max-width: 980px){
+      .layout{ grid-template-columns: 1fr; }
+      .main{ min-height: 420px; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <section class="shell">
+      <div class="topbar">
+        <div class="brand">
+          <span class="badge">Mentorra Boardroom</span>
+          <div>
+            <h1 id="title">Session</h1>
+            <p class="sub" id="sub">Loading selected mentors…</p>
+          </div>
+        </div>
+        <div class="mode-pill" id="modePill">Mode: —</div>
+      </div>
+
+      <div class="layout">
+        <!-- Left: Selected mentors -->
+        <aside class="panel">
+          <div class="panel-title">
+            <h2>Selected mentors</h2>
+            <span class="count"><span id="count">0</span> selected</span>
+          </div>
+
+          <div class="mentor-list" id="mentorList"></div>
+
+          <div class="actions">
+            <button class="btn" id="backBtn" type="button">Back</button>
+            <button class="btn primary" id="swapModeBtn" type="button">Switch Mode</button>
+          </div>
+
+          <p class="hint" style="margin-top:10px">
+            Tip: the first selected mentor becomes <strong>Primary</strong>; others join as specialists.
+          </p>
+        </aside>
+
+        <!-- Right: Voice widgets or Text panel -->
+        <section class="main">
+          <div class="main-head">
+            <div>
+              <h2 id="mainTitle">Boardroom</h2>
+              <p id="mainDesc">Loading…</p>
+            </div>
+            <span class="tiny" id="privacyTag">🔒 Privacy-first</span>
+          </div>
+
+          <div id="voiceArea" class="widgets" style="display:none;"></div>
+
+          <div id="textArea" style="display:none;">
+            <div class="text-box">
+              <div class="widget-top">
+                <div class="label">Text session</div>
+                <span class="tiny">Draft → refine → decide</span>
+              </div>
+
+              <div class="text-row">
+                <textarea id="textInput" placeholder="Describe your situation. Include: goal, constraints, timeline, what you’ve tried, and what decision you need to make."></textarea>
+              </div>
+
+              <div class="actions" style="justify-content:flex-end; margin-top:10px;">
+                <button class="btn" id="clearBtn" type="button">Clear</button>
+                <button class="btn primary" id="runTextBtn" type="button">Run Boardroom</button>
+              </div>
+
+              <p class="hint">
+                This is a UI-only panel for now. Wire it to your backend later (router → mentors → synthesis) to generate a 30-day plan and decisions.
+              </p>
+            </div>
+
+            <div class="widget-card" style="margin-top:14px;">
+              <div class="widget-top">
+                <div class="label">Boardroom output</div>
+                <span class="tiny">placeholder</span>
+              </div>
+              <div id="textOutput" style="font-size:13px; color:#374151; line-height:1.5;">
+                Your synthesis will appear here.
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="spacer"></div>
+
+      <footer class="footer">
+        🎙 Voice-first by default • 🔒 Privacy-first • Powered by ElevenLabs • © 2026 Mentorra. All rights reserved.
+      </footer>
+    </section>
+  </main>
+
+  <script>
+    /**
+     * boardroom.html
+     * URL format: boardroom.html?mode=voice&mentors=vincent,adrian,katerina
+     * - mode: "voice" | "text" (defaults to voice)
+     * - mentors: comma-separated mentor ids (1–4 recommended; if more, we cap to 4)
+     */
+
+    // --- Mentor directory (update agent ids anytime) ---
+    const MENTORS = {
+      vincent: {
+        id: "vincent",
+        name: "Vincent Forge",
+        role: "The Impossible Builder",
+        photo: "https://mentorra.xyz/Mentors/vincent-forge.png",
+        // Vincent already has a unique agent id (from your note)
+        agentId: "agent_1701kgb25h08et5rmczn7zd991v5"
+      },
+      adrian: {
+        id: "adrian",
+        name: "Adrian Insight",
+        role: "The Startup Sage",
+        photo: "https://mentorra.xyz/Mentors/adrian-insight.png",
+        // TODO: replace with real agent-id when ready
+        agentId: "agent_6101kgb383vpfds9h979hrrg9h0k"
+      },
+      katerina: {
+        id: "katerina",
+        name: "Katerina Catalyst",
+        role: "The Scrappy Disruptor",
+        photo: "https://mentorra.xyz/Mentors/katerina-catalyst.png",
+        // TODO: replace with real agent-id when ready
+        agentId: "agent_6101kgb383vpfds9h979hrrg9h0k"
+      },
+      sophia: {
+        id: "sophia",
+        name: "Sophia Architect",
+        role: "The Experience Designer",
+        photo: "https://mentorra.xyz/Mentors/sophia-architect.png",
+        // TODO: replace with real agent-id when ready
+        agentId: "agent_6101kgb383vpfds9h979hrrg9h0k"
+      },
+
+      // Placeholder ids so your selection page can send mentor5..mentor12
+      mentor5:  { id:"mentor5",  name:"Mentor Five",  role:"Placeholder Archetype", photo:"https://mentorra.xyz/Mentors/vincent-forge.png",  agentId:"agent_6101kgb383vpfds9h979hrrg9h0k" },
+      mentor6:  { id:"mentor6",  name:"Mentor Six",   role:"Placeholder Archetype", photo:"https://mentorra.xyz/Mentors/adrian-insight.png", agentId:"agent_6101kgb383vpfds9h979hrrg9h0k" },
+      mentor7:  { id:"mentor7",  name:"Mentor Seven", role:"Placeholder Archetype", photo:"https://mentorra.xyz/Mentors/katerina-catalyst.png", agentId:"agent_6101kgb383vpfds9h979hrrg9h0k" },
+      mentor8:  { id:"mentor8",  name:"Mentor Eight", role:"Placeholder Archetype", photo:"https://mentorra.xyz/Mentors/sophia-architect.png", agentId:"agent_6101kgb383vpfds9h979hrrg9h0k" },
+      mentor9:  { id:"mentor9",  name:"Mentor Nine",  role:"Placeholder Archetype", photo:"https://mentorra.xyz/Mentors/vincent-forge.png",  agentId:"agent_6101kgb383vpfds9h979hrrg9h0k" },
+      mentor10: { id:"mentor10", name:"Mentor Ten",   role:"Placeholder Archetype", photo:"https://mentorra.xyz/Mentors/adrian-insight.png", agentId:"agent_6101kgb383vpfds9h979hrrg9h0k" },
+      mentor11: { id:"mentor11", name:"Mentor Eleven",role:"Placeholder Archetype", photo:"https://mentorra.xyz/Mentors/katerina-catalyst.png", agentId:"agent_6101kgb383vpfds9h979hrrg9h0k" },
+      mentor12: { id:"mentor12", name:"Mentor Twelve",role:"Placeholder Archetype", photo:"https://mentorra.xyz/Mentors/sophia-architect.png", agentId:"agent_6101kgb383vpfds9h979hrrg9h0k" },
+    };
+
+    // --- Parse URL params ---
+    const params = new URLSearchParams(window.location.search);
+    const mode = (params.get("mode") || "voice").toLowerCase() === "text" ? "text" : "voice";
+    const raw = (params.get("mentors") || "").trim();
+
+    const requestedIds = raw
+      ? raw.split(",").map(s => s.trim()).filter(Boolean)
+      : ["vincent"]; // fallback
+
+    // Cap to 4 mentors for clean UX (1–4)
+    const mentorIds = requestedIds.slice(0, 4);
+
+    const selectedMentors = mentorIds
+      .map(id => MENTORS[id])
+      .filter(Boolean);
+
+    // If none matched, fallback
+    if (selectedMentors.length === 0) selectedMentors.push(MENTORS.vincent);
+
+    // --- DOM refs ---
+    const countEl = document.getElementById("count");
+    const mentorList = document.getElementById("mentorList");
+    const titleEl = document.getElementById("title");
+    const subEl = document.getElementById("sub");
+    const modePill = document.getElementById("modePill");
+    const mainTitle = document.getElementById("mainTitle");
+    const mainDesc = document.getElementById("mainDesc");
+    const voiceArea = document.getElementById("voiceArea");
+    const textArea = document.getElementById("textArea");
+
+    // Buttons
+    document.getElementById("backBtn").addEventListener("click", () => history.back());
+    document.getElementById("swapModeBtn").addEventListener("click", () => {
+      const next = mode === "voice" ? "text" : "voice";
+      const qs = new URLSearchParams(window.location.search);
+      qs.set("mode", next);
+      window.location.search = qs.toString();
+    });
+
+    // --- Render selected mentors list ---
+    function renderMentorList() {
+      mentorList.innerHTML = "";
+      countEl.textContent = String(selectedMentors.length);
+
+      selectedMentors.forEach((m, idx) => {
+        const chip = document.createElement("div");
+        chip.className = "mentor-chip" + (idx === 0 ? " primary" : "");
+        chip.innerHTML = `
+          <img class="mentor-photo" src="${m.photo}" alt="${m.name} portrait" />
+          <div class="mentor-meta">
+            <p class="mentor-name">${m.name}</p>
+            <p class="mentor-role">${m.role}</p>
+          </div>
+          <span class="pill ${idx === 0 ? "primary" : ""}">${idx === 0 ? "Primary" : "Specialist"}</span>
+        `;
+        mentorList.appendChild(chip);
+      });
+    }
+
+    // --- Render mode content ---
+    function renderVoiceWidgets() {
+      voiceArea.style.display = "grid";
+      textArea.style.display = "none";
+
+      const primary = selectedMentors[0];
+      const specialists = selectedMentors.slice(1);
+
+      mainTitle.textContent = "Voice boardroom";
+      mainDesc.textContent =
+        specialists.length
+          ? `Primary mentor leads the session; ${specialists.length} specialist${specialists.length === 1 ? "" : "s"} available for deeper perspective.`
+          : "Primary mentor leads the session for fast clarity and decisions.";
+
+      // Build widgets (one per mentor)
+      voiceArea.innerHTML = "";
+
+      selectedMentors.forEach((m, idx) => {
+        const wrap = document.createElement("div");
+        wrap.className = "widget-card";
+        wrap.innerHTML = `
+          <div class="widget-top">
+            <div class="label">
+              ${idx === 0 ? "⭐ Primary mentor" : "👥 Specialist mentor"}
+              <span style="font-weight:900;color:#111">${m.name}</span>
+            </div>
+            <span class="tiny">${m.role}</span>
+          </div>
+
+          <elevenlabs-convai agent-id="${m.agentId}"></elevenlabs-convai>
+        `;
+        voiceArea.appendChild(wrap);
+      });
+
+      // Load embed script once
+      ensureElevenLabsScript();
+    }
+
+    function renderTextPanel() {
+      voiceArea.style.display = "none";
+      textArea.style.display = "block";
+
+      mainTitle.textContent = "Text boardroom";
+      mainDesc.textContent =
+        "Write your situation once. The boardroom will turn it into a clear decision and a 30-day execution plan (wire backend later).";
+
+      const clearBtn = document.getElementById("clearBtn");
+      const runBtn = document.getElementById("runTextBtn");
+      const input = document.getElementById("textInput");
+      const output = document.getElementById("textOutput");
+
+      clearBtn.onclick = () => {
+        input.value = "";
+        output.textContent = "Your synthesis will appear here.";
+      };
+
+      runBtn.onclick = () => {
+        const names = selectedMentors.map((m,i)=> (i===0?`Primary: ${m.name}`:`Specialist: ${m.name}`)).join(" • ");
+        const text = input.value.trim();
+        if (!text) {
+          output.innerHTML = "<strong>Please add context above.</strong> Include your goal, constraints, and the decision you need to make.";
+          return;
+        }
+        output.innerHTML = `
+          <div style="margin-bottom:8px"><strong>Selected boardroom:</strong> ${names}</div>
+          <div style="margin-bottom:8px"><strong>Your input:</strong> ${escapeHtml(text)}</div>
+          <div><strong>Next:</strong> Wire this to your API (router → mentors → synthesis) and replace this placeholder with the real response.</div>
+        `;
+      };
+    }
+
+    // --- Helpers ---
+    function ensureElevenLabsScript() {
+      // If already present, do nothing
+      if (document.querySelector('script[data-elevenlabs="1"]')) return;
+
+      const s = document.createElement("script");
+      s.src = "https://unpkg.com/@elevenlabs/convai-widget-embed";
+      s.async = true;
+      s.type = "text/javascript";
+      s.dataset.elevenlabs = "1";
+      document.body.appendChild(s);
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, (c) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[c]));
+    }
+
+    // --- Page copy ---
+    (function init() {
+      renderMentorList();
+
+      modePill.textContent = `Mode: ${mode === "voice" ? "Voice" : "Text"}`;
+      titleEl.textContent = mode === "voice" ? "Voice session" : "Text session";
+
+      const names = selectedMentors.map(m => m.name);
+      subEl.textContent = `Boardroom: ${names.join(", ")}.`;
+
+      if (mode === "voice") renderVoiceWidgets();
+      else renderTextPanel();
+    })();
+  </script>
+</body>
+</html>
