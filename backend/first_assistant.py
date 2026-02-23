@@ -1,25 +1,23 @@
 import os
 import json
 import io
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 
 from fastapi import FastAPI, HTTPException, UploadFile, File
-
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from openai import OpenAI, APIError
 from dotenv import load_dotenv
 
-
-
 # ✅ Updated import (NO .client)
 from elevenlabs import ElevenLabs
 
-# Load environment variables
+# -------------------------
+# Env + app setup
+# -------------------------
 load_dotenv()
 
-# Verify API Keys exist
 if not os.getenv("OPENAI_API_KEY"):
     raise ValueError("OPENAI_API_KEY is missing in .env")
 if not os.getenv("ELEVENLABS_API_KEY"):
@@ -27,23 +25,20 @@ if not os.getenv("ELEVENLABS_API_KEY"):
 
 app = FastAPI(title="Mentorra Backend")
 
-# Allow CORS for local frontend development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # ok for dev; lock down for prod
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-
-# Initialize Clients
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 elevenlabs_client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
 
-# --- Data Models ---
-
+# -------------------------
+# Models
+# -------------------------
 class FounderProfile(BaseModel):
     industry: Optional[str] = None
     stage: Optional[str] = None
@@ -60,18 +55,94 @@ class MentorResponse(BaseModel):
     switched_track: bool
     reply: str
     clarifying_question: Optional[str] = None
-    next_actions: List[str]
-    # ✅ Added to support the new prompt requirement
-    suggested_agents: List[Dict[str, float]] 
-    memory_update: str
+    # ✅ HTML expects list[str] (ids or name fragments)
+    suggested_agents: List[str] = Field(default_factory=list)
+    memory_update: str = ""
 
 class TTSRequest(BaseModel):
     text: str
-    voice_id: Optional[str] = "JBFqnCBsd6RMkjVDRZzb"  # Default ElevenLabs voice
+    voice_id: Optional[str] = "JBFqnCBsd6RMkjVDRZzb"
     model_id: Optional[str] = "eleven_monolingual_v1"
     output_format: Optional[str] = "mp3_44100_128"
 
-# --- Toolhouse Agent Logic ---
+# -------------------------
+# Router config
+# -------------------------
+AGENTS = [
+    {"id": "vincent_forge", "name": "Vincent Forge"},
+    {"id": "katerina_catalyst", "name": "Katerina Catalyst"},
+    {"id": "sophia_architect", "name": "Sophia Architect"},
+    {"id": "adrian_insight", "name": "Adrian Insight"},
+]
+
+AGENT_ID_MAP = {
+    "vincent forge": "vincent_forge",
+    "katerina catalyst": "katerina_catalyst",
+    "sophia architect": "sophia_architect",
+    "adrian insight": "adrian_insight",
+}
+
+def normalize_suggested_agents(val: Any) -> List[str]:
+    """
+    Accepts:
+      - ["vincent_forge", "Sophia Architect", ...]
+      - [{"Vincent Forge": 0.95}, {"Sophia Architect": 0.87}]  (legacy)
+    Returns:
+      - ["vincent_forge", "sophia_architect", ...] (deduped)
+    """
+    if not val:
+        return []
+
+    out: List[str] = []
+
+    if isinstance(val, list):
+        for item in val:
+            if isinstance(item, str):
+                s = item.strip().lower()
+                # allow passing id directly
+                if s in {a["id"] for a in AGENTS}:
+                    out.append(s)
+                else:
+                    out.append(AGENT_ID_MAP.get(s, item.strip()))
+            elif isinstance(item, dict) and item:
+                # legacy dict form
+                k = next(iter(item.keys()))
+                s = str(k).strip().lower()
+                out.append(AGENT_ID_MAP.get(s, str(k).strip()))
+    elif isinstance(val, dict) and val:
+        # sometimes model might output dict {"vincent_forge":0.9,...}
+        for k in val.keys():
+            s = str(k).strip().lower()
+            out.append(AGENT_ID_MAP.get(s, str(k).strip()))
+
+    # dedupe preserve order
+    seen = set()
+    deduped = []
+    for x in out:
+        # normalize ids to lowercase snake for consistency if matches
+        lx = x.strip().lower()
+        if lx in {a["id"] for a in AGENTS}:
+            x = lx
+        if x not in seen:
+            seen.add(x)
+            deduped.append(x)
+    return deduped
+
+def should_restrict_agents(suggested: List[str], selected_track: str) -> List[str]:
+    """
+    If router is not confident / not really suggesting, return [] so the UI shows all.
+    We implement a simple heuristic:
+      - If list is empty -> no restriction
+      - If list contains all 4 agents -> treat as no restriction (UI shows all)
+      - If top suggestion does not match selected track -> still allow restriction (fine)
+    """
+    if not suggested:
+        return []
+    # If router returns all 4, treat as "no specific suggestions"
+    ids = [s for s in suggested if s in {a["id"] for a in AGENTS}]
+    if len(set(ids)) >= 4:
+        return []
+    return suggested
 
 SYSTEM_PROMPT_TEMPLATE = """
 You are the Mentorra Routing Agent. You act as the brain behind a founder's mentorship experience.
@@ -80,77 +151,71 @@ You have access to the following roster of Elite Mentors. You must analyze the u
 
 ### MENTOR ROSTER
 
-1. **Vincent Forge — The Impossible Builder**
-   - **Tagline:** Make the impossible inevitable through first principles and relentless execution
-   - **Philosophy:** Most limits are just stacked assumptions. If physics allows it, it can be engineered—aim for 10x and move fast.
-   - **Best for:** Moonshots, first-principles problem solving, rapid iteration, scaling hard systems
-   - **Style:** Direct, intense, impatient with excuses
-   - **Signature question:** ‘What’s the actual constraint here?’
-
-2. **Katerina Catalyst — The Scrappy Disruptor**
-   - **Tagline:** Turn your struggles into your advantage—bootstrap, hustle, believe
-   - **Philosophy:** Great businesses come from personal pain points. Constraints create creativity—start scrappy, sell early, and learn from ‘no.’
-   - **Best for:** Bootstrapping, getting first customers, sales confidence, resilience through rejection
-   - **Style:** Warm, encouraging, real—pushes you without shaming you
-   - **Signature question:** ‘What would make YOU buy this?’
-
-3. **Sophia Architect — The Experience Designer**
-   - **Tagline:** Design experiences people love, not just products they use
-   - **Philosophy:** Features are commodities; experiences create loyalty. Map the full journey and obsess over trust, delight, and story.
-   - **Best for:** UX/customer journey, brand storytelling, trust & safety, differentiation through experience
-   - **Style:** Thoughtful, human-centered, detail-obsessed
-   - **Signature question:** ‘What’s the 11-star version of this?’
-
-4. **Adrian Insight — The Startup Sage**
-   - **Tagline:** Make something people want—everything else is noise
-   - **Philosophy:** Startups fail when they build in isolation. Talk to users, launch early, measure behavior, iterate until PMF.
-   - **Best for:** Pre-PMF clarity, idea validation, pivot decisions, early execution strategy
-   - **Style:** Calm, clear, direct—cuts through hype
-   - **Signature question:** ‘Do people actually want this?’
+1. Vincent Forge — The Impossible Builder
+2. Katerina Catalyst — The Scrappy Disruptor
+3. Sophia Architect — The Experience Designer
+4. Adrian Insight — The Startup Sage
 
 ### INSTRUCTIONS
 
 You will receive:
-- role: The current agent role (Router & Mentor Persona)
-- user_message: A single string from the founder
+- user_message: a single string from the founder
 - founder_profile: JSON summary of what we know so far
-- active_mentor: Current mentor track id if already selected
-- memory_context: Previous context of the conversation
+- active_mentor: current mentor track name if already selected
+- memory_context: previous context of the conversation
 
 Primary goals:
-1) **Analyze:** Compare the user's situation against the 4 mentors above. Calculate a confidence score (0.0 to 1.0) for how well EACH mentor fits the current request.
-2) **Select:** Choose the single best mentor track (use the full name, e.g., "Vincent Forge").
-3) **Switching:** Decide whether to switch mentors. Prefer stability unless the user’s intent clearly aligns better with a different mentor's specialty.
-4) **Reply:** Reply AS the selected mentor. Adopt their specific **Style**, **Philosophy**, and **Signature Question** (if applicable).
-5) **Action:** Provide 2–5 next actions that the founder can do immediately (this week).
-6) **Memory:** Update "memory_update" compactly so the next call stays consistent.
+1) Analyze which mentor fits best and decide whether switching is necessary.
+2) Select a single best mentor track (use the mentor's name, e.g., "Vincent Forge").
+3) Reply AS the selected mentor (voice/style matching).
+4) Memory: update "memory_update" compactly.
 
-### OUTPUT FORMAT
+### IMPORTANT: suggested_agents behavior for the UI
+- If you have a strong preference, set "suggested_agents" to a list of mentor IDs in order, like:
+  ["vincent_forge","sophia_architect"]
+- If you do NOT have a strong preference (unclear, general, or user is just exploring), set:
+  "suggested_agents": []
+This lets the UI show all mentors by default.
 
-Output must be valid JSON matching this schema exactly:
+Valid mentor IDs:
+- vincent_forge
+- katerina_catalyst
+- sophia_architect
+- adrian_insight
+
+### OUTPUT FORMAT (JSON ONLY)
+
+Return valid JSON matching this schema exactly:
 {
-  "mentor_track": "string (Name of the selected mentor)",
+  "mentor_track": "string",
   "switched_track": boolean,
-  "reply": "string (in the voice of the selected mentor)",
+  "reply": "string",
   "clarifying_question": "string or null",
-  "next_actions": ["action1", "action2"],
-  "suggested_agents": [{"Agent Name": 0.95}, {"Agent Name": 0.87}],
-  "memory_update": "string summary of new facts"
+  "suggested_agents": ["string", "..."],
+  "memory_update": "string"
 }
-
-*Note on suggested_agents:* Include all 4 mentors in the list, sorted by confidence score in descending order.
 """
 
+# -------------------------
+# Health (optional but useful)
+# -------------------------
+@app.get("/health")
+def health():
+    return {"ok": True}
+
+# -------------------------
+# Mentorra main route
+# -------------------------
 @app.post("/api/mentor-assist", response_model=MentorResponse)
 async def mentor_assist(request: UserRequest):
     try:
         user_input_context = f"""
-        INPUT DATA:
-        - User Message: \"{request.user_message}\"
-        - Active Mentor Track: {request.active_mentor_track if request.active_mentor_track else "None"}
-        - Founder Profile: {request.founder_profile.model_dump_json() if request.founder_profile else "Unknown"}
-        - Memory Context: {request.memory_context}
-        """
+INPUT DATA:
+- User Message: "{request.user_message}"
+- Active Mentor Track: {request.active_mentor_track if request.active_mentor_track else "None"}
+- Founder Profile: {request.founder_profile.model_dump_json() if request.founder_profile else "Unknown"}
+- Memory Context: {request.memory_context}
+""".strip()
 
         try:
             completion = openai_client.chat.completions.create(
@@ -163,9 +228,8 @@ async def mentor_assist(request: UserRequest):
                 temperature=0.7,
             )
         except APIError:
-            # Fallback to gpt-4o-mini
             completion = openai_client.chat.completions.create(
-                model="gpt-4o-mini", 
+                model="gpt-4o-mini",
                 response_format={"type": "json_object"},
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE},
@@ -176,20 +240,35 @@ async def mentor_assist(request: UserRequest):
 
         raw_content = completion.choices[0].message.content
         data = json.loads(raw_content)
+
+        # -------------------------
+        # Normalize + defaults
+        # -------------------------
+        data.setdefault("mentor_track", request.active_mentor_track or "Adrian Insight")
+        data.setdefault("switched_track", False)
+        data.setdefault("reply", "")
+        data.setdefault("clarifying_question", None)
+        data.setdefault("memory_update", "")
+
+        # normalize suggested_agents to list[str]
+        suggested = normalize_suggested_agents(data.get("suggested_agents"))
+        # optionally restrict only if it's a real suggestion
+        suggested = should_restrict_agents(suggested, str(data.get("mentor_track", "")))
+
+        data["suggested_agents"] = suggested
+
+        # Return validated response
         return MentorResponse(**data)
 
     except Exception as e:
         print(f"Mentor Assist Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-# --- Voice Mode Endpoints ---
-
+# -------------------------
+# Voice endpoints
+# -------------------------
 @app.post("/api/voice/speak")
 async def text_to_speech(request: TTSRequest):
-    """
-    Converts text into audio using ElevenLabs.
-    Streams MP3 audio back to the client.
-    """
     try:
         audio_stream = elevenlabs_client.text_to_speech.convert(
             voice_id=request.voice_id,
@@ -211,14 +290,10 @@ async def text_to_speech(request: TTSRequest):
 
 @app.post("/api/voice/transcribe")
 async def speech_to_text(file: UploadFile = File(...)):
-    """
-    Transcribes an uploaded audio file into text using OpenAI Whisper.
-    """
     try:
         audio_bytes = await file.read()
-
         audio_file = io.BytesIO(audio_bytes)
-        audio_file.name = file.filename or "audio.mp3"
+        audio_file.name = file.filename or "audio.webm"
 
         transcript = openai_client.audio.transcriptions.create(
             model="whisper-1",
