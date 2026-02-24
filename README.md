@@ -193,7 +193,7 @@ Mentorra starts with founders — and expands to:
 
 ## 📫 Contact
 For questions, demos, or collaboration:
-- Open an issue
+- Open an issue.
 - Reach out via the hackathon Discord
 
 ---
