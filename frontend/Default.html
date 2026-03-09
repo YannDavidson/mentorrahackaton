@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mentorra - Demo</title>
-  <meta name="description" content="Mentorra demo — voice mentors that help you build, decide, and ship." />
+  <title>Mentorra - Decision Infrastructure</title>
+  <meta name="description" content="Mentorra — decision infrastructure for founders. Turn complex questions into clear next steps." />
   <style>
     :root{
       --bg:#ffffff;
@@ -59,7 +59,7 @@
       display:flex;
       align-items:center;
       gap:12px;
-      min-width: 190px;
+      min-width: 210px;
     }
     .logo{
       width:34px;
@@ -86,7 +86,7 @@
     }
     @keyframes spin{ to{ transform: rotate(360deg); } }
 
-    .brand strong{ font-weight: 700; letter-spacing:-0.02em; }
+    .brand strong{ font-weight: 800; letter-spacing:-0.02em; }
     .brand small{
       display:block;
       color:rgba(17,24,39,.62);
@@ -98,14 +98,17 @@
     .nav-links{
       display:flex;
       align-items:center;
-      gap:18px;
+      gap:6px;
       color: rgba(17, 24, 39, .80);
       font-size: 14px;
+      flex-wrap: wrap;
+      justify-content:center;
     }
     .nav-links a{
       padding: 10px 10px;
       border-radius: 12px;
       transition: background .15s ease;
+      white-space: nowrap;
     }
     .nav-links a:hover{ background: rgba(15,23,42,.06); }
 
@@ -113,7 +116,7 @@
       display:flex;
       align-items:center;
       gap:10px;
-      min-width: 220px;
+      min-width: 240px;
       justify-content:flex-end;
     }
 
@@ -147,10 +150,16 @@
       box-shadow: 0 16px 34px rgba(59,130,246,.20);
     }
     .btn.primary:hover{ box-shadow: 0 22px 44px rgba(168,85,247,.22); }
+    .btn.full{ width: 100%; justify-content:center; }
+    .btn.ghost{
+      background: rgba(255,255,255,.70);
+      border: 1px solid rgba(15,23,42,.10);
+      box-shadow: 0 10px 26px rgba(0,0,0,.06);
+    }
 
-    /* ===== HERO (PRO / EXECUTIVE) ===== */
-    .hero{ padding: 112px 0 84px; }
-    .hero-center{ max-width: 880px; margin: 0 auto; text-align: center; }
+    /* ===== HERO ===== */
+    .hero{ padding: 112px 0 58px; }
+    .hero-center{ max-width: 920px; margin: 0 auto; text-align: center; }
     .eyebrow{
       display:inline-flex; align-items:center; gap:10px;
       padding: 8px 12px; border-radius: 999px;
@@ -168,11 +177,11 @@
       font-size: clamp(48px, 5.4vw, 76px);
       line-height: 1.03;
       letter-spacing: -0.06em;
-      font-weight: 820;
+      font-weight: 860;
     }
     .sub{
       margin: 0 auto;
-      max-width: 62ch;
+      max-width: 72ch;
       font-size: 18px;
       line-height: 1.65;
       color: rgba(17,24,39,.72);
@@ -202,13 +211,13 @@
     }
 
     /* Sections */
-    .section{ padding: 42px 0; }
+    .section{ padding: 46px 0; }
     .section-head{
       display:flex;
       align-items:flex-end;
       justify-content:space-between;
       gap: 18px;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
     h2{ margin: 0; font-size: 24px; letter-spacing:-0.03em; }
     .hint{
@@ -216,21 +225,25 @@
       color: rgba(17,24,39,.64);
       font-size: 14px;
       line-height: 1.5;
-      max-width: 68ch;
+      max-width: 74ch;
     }
 
-    /* Video + resources */
+    /* Video + right panel */
     .grid{
       display:grid;
       grid-template-columns: 1.1fr .9fr;
       gap: 18px;
+      align-items: stretch;
     }
+
     .video-shell{
       border-radius: var(--radius);
       overflow:hidden;
       border: 1px solid var(--line);
       background: rgba(255,255,255,.72);
       box-shadow: var(--shadow2);
+      display:flex;
+      flex-direction: column;
     }
     .video{
       aspect-ratio: 16/9;
@@ -241,9 +254,10 @@
                   radial-gradient(680px 380px at 75% 30%, rgba(168,85,247,.16), transparent 65%),
                   radial-gradient(700px 420px at 60% 100%, rgba(255,45,85,.08), transparent 62%),
                   rgba(12,12,18,.96);
+      flex: 1 1 auto;
     }
     .video-note{
-      padding: 14px 16px;
+      padding: 12px 14px;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -253,22 +267,465 @@
       border-top: 1px solid var(--line);
       background: rgba(255,255,255,.68);
     }
+
     .card{
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: linear-gradient(to bottom, rgba(255,255,255,.82), rgba(255,255,255,.56));
       box-shadow: var(--shadow2);
       overflow: hidden;
+      display:flex;
+      flex-direction: column;
     }
     .card.pad{ padding: 18px; }
-    .tag{
+
+    /* ===== Carousel Panel ===== */
+    .mentor-panel-head{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;
+    }
+    .mentor-panel-head strong{ font-weight:820; letter-spacing:-0.02em; }
+    .mentor-panel-sub{
+      margin: 0 0 12px;
+      color: rgba(17,24,39,.70);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .carousel{
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,.70);
+      overflow: hidden;
+      flex: 1 1 auto;
+      display:flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .track{
+      display:flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 12px;
+      padding: 12px;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      flex: 1 1 auto;
+    }
+    .track::-webkit-scrollbar{ height: 10px; }
+    .track::-webkit-scrollbar-thumb{
+      background: rgba(15,23,42,.14);
+      border-radius: 999px;
+    }
+
+    .slide{
+      flex: 0 0 84%;
+      scroll-snap-align: start;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: linear-gradient(to bottom, rgba(255,255,255,.92), rgba(255,255,255,.72));
+      box-shadow: 0 10px 22px rgba(0,0,0,.06);
+      overflow:hidden;
+      display:flex;
+      gap: 12px;
+      padding: 12px;
+      min-height: 124px;
+      align-items: center;
+      cursor: pointer;
+      transition: transform .14s ease, box-shadow .14s ease;
+    }
+    .slide:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(0,0,0,.08);
+    }
+
+    .mphoto{
+      width: 92px;
+      height: 92px;
+      border-radius: 14px;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      background: #e9eef5;
+      flex: 0 0 auto;
+    }
+    .minfo{ min-width: 0; }
+    .mname{
+      margin:0;
+      font-size: 14px;
+      font-weight: 860;
+      letter-spacing: -0.02em;
+    }
+    .marche{
+      margin:4px 0 8px;
+      font-size: 12.5px;
+      color: rgba(17,24,39,.64);
+    }
+    .mquote{
+      margin:0;
+      font-size: 12.5px;
+      color: rgba(17,24,39,.78);
+      line-height: 1.35;
+    }
+
+    /* Arrow overlays */
+    .arrow{
+      position:absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.82);
+      box-shadow: 0 10px 22px rgba(0,0,0,.10);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .14s ease, background .14s ease, box-shadow .14s ease;
+      z-index: 5;
+    }
+    .arrow:hover{
+      transform: translateY(-50%) scale(1.04);
+      background: rgba(255,255,255,.95);
+      box-shadow: 0 14px 28px rgba(0,0,0,.12);
+    }
+    .arrow:active{ transform: translateY(-50%) scale(.98); }
+    .arrow.left{ left: 10px; }
+    .arrow.right{ right: 10px; }
+    .arrow svg{ width: 18px; height: 18px; fill: rgba(17,24,39,.86); }
+
+    .res-meta{
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.60);
+      color: rgba(17,24,39,.74);
+      font-size:13px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    /* ===== Decision Infrastructure Steps ===== */
+    .steps{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .step{
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(to bottom, rgba(255,255,255,.86), rgba(255,255,255,.58));
+      box-shadow: var(--shadow2);
+      padding: 20px;
+      overflow: hidden;
+      position: relative;
+      min-height: 172px;
+    }
+    .step::after{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background:
+        radial-gradient(420px 240px at 20% 10%, rgba(59,130,246,.12), transparent 55%),
+        radial-gradient(420px 260px at 90% 20%, rgba(168,85,247,.10), transparent 60%),
+        radial-gradient(420px 280px at 40% 95%, rgba(255,45,85,.08), transparent 62%);
+      pointer-events:none;
+    }
+    .step-top{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      position: relative;
+      z-index: 1;
+    }
+    .kicker{
+      font-size: 11px;
+      font-weight: 820;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(17,24,39,.60);
+    }
+    .pill{
       font-size: 12px;
       padding: 6px 10px;
       border-radius: 999px;
       border: 1px solid var(--line);
-      background: rgba(255,255,255,.55);
-      color: rgba(17,24,39,.70);
+      background: rgba(255,255,255,.64);
+      color: rgba(17,24,39,.72);
       white-space: nowrap;
+    }
+    .step h3{
+      margin: 10px 0 8px;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+      font-weight: 860;
+      position: relative;
+      z-index: 1;
+    }
+    .step p{
+      margin: 0;
+      color: rgba(17,24,39,.70);
+      font-size: 14px;
+      line-height: 1.55;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== Premium Pricing ===== */
+    .pricing{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .tier{
+      border-radius: calc(var(--radius) + 2px);
+      background: rgba(255,255,255,.55);
+      border: 1px solid rgba(15,23,42,.10);
+      box-shadow: 0 14px 42px rgba(0,0,0,.08);
+      overflow: hidden;
+      position: relative;
+      min-width: 0;
+    }
+
+    .tier .tier-glow{
+      position:absolute; inset:-60%;
+      background:
+        radial-gradient(560px 260px at 20% 10%, rgba(59,130,246,.18), transparent 60%),
+        radial-gradient(560px 280px at 90% 20%, rgba(168,85,247,.16), transparent 62%),
+        radial-gradient(560px 300px at 50% 95%, rgba(255,45,85,.10), transparent 64%);
+      filter: blur(2px);
+      opacity: .9;
+      pointer-events:none;
+    }
+
+    .tier-inner{
+      position: relative;
+      padding: 18px;
+      background: linear-gradient(to bottom, rgba(255,255,255,.90), rgba(255,255,255,.62));
+      border-radius: calc(var(--radius) + 2px);
+      height: 100%;
+      display:flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .tier-top{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    }
+    .tier h3{
+      margin:0;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+    .tier .blurb{
+      margin: 6px 0 0;
+      font-size: 12.5px;
+      color: rgba(17,24,39,.70);
+      line-height: 1.5;
+      max-width: 36ch;
+    }
+    .price{
+      font-weight: 920;
+      letter-spacing: -0.04em;
+      font-size: 20px;
+      white-space: nowrap;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 780;
+      letter-spacing: -0.01em;
+      border: 1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.66);
+      color: rgba(17,24,39,.76);
+      width: fit-content;
+    }
+    .badge i{
+      width:8px;height:8px;border-radius:999px; display:inline-block;
+      background: linear-gradient(135deg, var(--accentA), var(--accentB) 60%, var(--accentC));
+      box-shadow: 0 0 0 4px rgba(168,85,247,.10);
+    }
+
+    .badge.popular{
+      border: 0;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accentA), var(--accentB) 55%, var(--accentC));
+      box-shadow: 0 14px 34px rgba(168,85,247,.22);
+    }
+    .badge.popular i{
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.18);
+    }
+
+    .divider{
+      height: 1px;
+      background: rgba(15,23,42,.10);
+      margin: 4px 0 0;
+    }
+
+    .feat{
+      margin: 0;
+      padding-left: 18px;
+      color: rgba(17,24,39,.80);
+      font-size: 12.5px;
+      line-height: 1.75;
+    }
+    .feat li{ margin: 2px 0; }
+    .tier .grow{ flex: 1 1 auto; }
+
+    .tier.featured{
+      border: 0;
+      background: linear-gradient(135deg, rgba(59,130,246,.95), rgba(168,85,247,.92) 55%, rgba(255,45,85,.92));
+      box-shadow: 0 22px 60px rgba(168,85,247,.22);
+    }
+    .tier.featured .tier-inner{
+      margin: 2px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: linear-gradient(to bottom, rgba(255,255,255,.92), rgba(255,255,255,.66));
+    }
+
+    /* ===== Early Access Glassy Gradient Surface ===== */
+    .early-surface{
+      border-radius: calc(var(--radius) + 10px);
+      border: 1px solid rgba(255,255,255,.55);
+      background:
+        radial-gradient(900px 420px at 15% 10%, rgba(59,130,246,.22), transparent 60%),
+        radial-gradient(900px 420px at 90% 20%, rgba(168,85,247,.18), transparent 62%),
+        radial-gradient(900px 520px at 50% 110%, rgba(255,45,85,.12), transparent 65%),
+        linear-gradient(to bottom, rgba(255,255,255,.62), rgba(255,255,255,.34));
+      box-shadow:
+        0 26px 70px rgba(0,0,0,.10),
+        inset 0 1px 0 rgba(255,255,255,.55);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      padding: 22px;
+      overflow:hidden;
+      position: relative;
+    }
+    .early-surface::before{
+      content:"";
+      position:absolute;
+      inset:-50%;
+      background:
+        conic-gradient(from 180deg,
+          rgba(255,255,255,0) 0%,
+          rgba(255,255,255,.35) 12%,
+          rgba(255,255,255,0) 25%,
+          rgba(255,255,255,.18) 40%,
+          rgba(255,255,255,0) 55%,
+          rgba(255,255,255,.22) 70%,
+          rgba(255,255,255,0) 100%);
+      filter: blur(22px);
+      opacity: .35;
+      pointer-events:none;
+      transform: rotate(10deg);
+    }
+
+    .early{
+      position: relative;
+      padding: 6px 0 0;
+    }
+
+    /* single-line desktop layout: text + form on same row */
+    .early-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 16px;
+      flex-wrap: nowrap;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+    .early-left{
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+    .early-left .k{
+      font-size: 11px;
+      font-weight: 860;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(17,24,39,.60);
+      margin-bottom: 6px;
+    }
+    .early-left h3{
+      margin: 0 0 6px;
+      font-size: 22px;
+      letter-spacing: -0.04em;
+      font-weight: 920;
+    }
+    .early-left .one-line{
+      margin: 0;
+      color: rgba(17,24,39,.70);
+      font-size: 14px;
+      line-height: 1.55;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .emailbar{
+      flex: 0 0 auto;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 999px;
+      background:
+        linear-gradient(to bottom, rgba(255,255,255,.82), rgba(255,255,255,.58));
+      border: 1px solid rgba(15,23,42,.12);
+      box-shadow:
+        0 18px 46px rgba(0,0,0,.10),
+        inset 0 1px 0 rgba(255,255,255,.65);
+      overflow:hidden;
+      position: relative;
+      z-index: 1;
+      white-space: nowrap;
+    }
+    .emailbar::before{
+      content:"";
+      width: 12px; height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accentA), var(--accentB) 60%, var(--accentC));
+      box-shadow: 0 0 0 6px rgba(168,85,247,.10);
+      margin-left: 6px;
+      flex: 0 0 auto;
+    }
+    .emailbar input{
+      border:0;
+      outline:none;
+      background: transparent;
+      padding: 10px 8px;
+      font-size: 14px;
+      min-width: 320px;
+      color: rgba(17,24,39,.95);
+    }
+    .emailbar input::placeholder{ color: rgba(17,24,39,.45); }
+    .emailbar .btn{
+      padding: 10px 16px;
+      box-shadow: 0 14px 34px rgba(168,85,247,.18);
+    }
+
+    .fineprint{
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(17,24,39,.62);
+      position: relative;
+      z-index: 1;
     }
 
     /* Footer */
@@ -289,12 +746,29 @@
     }
     .foot a:hover{ background: rgba(15,23,42,.06); }
 
-    /* Responsive */
+    @media (max-width: 1120px){
+      .pricing{ grid-template-columns: repeat(2, 1fr); }
+      .early-head{ flex-wrap: wrap; }
+      .early-left .one-line{
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+      }
+      .emailbar{ width: 100%; }
+      .emailbar input{ min-width: 0; flex: 1 1 auto; }
+    }
     @media (max-width: 980px){
       .grid{ grid-template-columns: 1fr; }
       .cta{ min-width:auto; }
       .nav-links{ display:none; }
-      .hero{ padding: 92px 0 66px; }
+      .hero{ padding: 92px 0 52px; }
+      .slide{ flex-basis: 92%; }
+      .arrow{ display:none; }
+      .steps{ grid-template-columns: 1fr; }
+      .pricing{ grid-template-columns: 1fr; }
+      .early-surface{ padding: 16px; }
+      .emailbar{ width: 100%; justify-content:space-between; }
+      .emailbar input{ min-width: 0; flex: 1 1 auto; }
     }
   </style>
 </head>
@@ -307,19 +781,19 @@
           <div class="logo" aria-hidden="true"></div>
           <div>
             <strong>Mentorra</strong>
-            <small>Voice mentors. Real outcomes.</small>
+            <small>Decision infrastructure for founders.</small>
           </div>
         </div>
 
         <nav class="nav-links" aria-label="Primary">
-          <a href="#demo">Demo Video</a>
-          <a href="#resources">Resources</a>
+          <a href="#how">How it works</a>
+          <a href="#demo">Demo</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#early">Early access</a>
         </nav>
 
         <div class="cta">
-          <a class="btn" id="githubLink" href="https://github.com/YannDavidson/mentorrahackaton" target="_blank" rel="noreferrer">
-            GitHub
-          </a>
+          <a class="btn" href="https://github.com/YannDavidson/mentorrahackaton" target="_blank" rel="noreferrer">GitHub</a>
           <a href="/Demo/" class="btn primary">Try the Demo</a>
         </div>
       </div>
@@ -328,22 +802,21 @@
 
   <main class="wrap">
 
-    <!-- HERO (PRO / EXECUTIVE / TEXT-ONLY) -->
     <section class="hero">
       <div class="hero-center">
         <div class="eyebrow">
           <span class="dot" aria-hidden="true"></span>
-          <span>Executive-grade AI mentors</span>
+          <span>Executive-grade decision infrastructure</span>
         </div>
 
         <h1>
           Decisions deserve<br />
-          better conversations.
+          better systems.
         </h1>
 
         <p class="sub">
-          Mentorra delivers <strong>expert reasoning through natural voice dialogue</strong> —
-          transforming complex questions into clear decisions and actionable next steps.
+          Mentorra turns high-stakes ambiguity into <strong>clear options</strong>, <strong>credible reasoning</strong>,
+          and <strong>next-step execution</strong> — through natural voice conversations.
         </p>
 
         <div class="hero-actions">
@@ -354,17 +827,65 @@
         <div class="chips">
           <span class="chip">Strategy</span>
           <span class="chip">Product</span>
-          <span class="chip">Growth</span>
-          <span class="chip">Execution</span>
+          <span class="chip">Go-to-Market</span>
+          <span class="chip">Hiring</span>
+          <span class="chip">Fundraising</span>
         </div>
       </div>
     </section>
 
-    <!-- DEMO VIDEO + RESOURCES -->
+    <!-- HOW IT WORKS -->
+    <section class="section" id="how">
+      <div class="section-head">
+        <div>
+          <h2>How it works</h2>
+          <p class="hint"> The pipeline: capture the decision, generate grounded options, and ship the next move.</p>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-top">
+            <div class="kicker">Step 1</div>
+            <div class="pill">Signal capture</div>
+          </div>
+          <h3>State the decision and constraints</h3>
+          <p>
+            Explain what you’re deciding, your current reality, deadlines, budget, risks, and what success looks like.</p>
+      
+        </div>
+
+        <div class="step">
+          <div class="step-top">
+            <div class="kicker">Step 2</div>
+            <div class="pill">Option design</div>
+          </div>
+          <h3>Get structured options + tradeoffs</h3>
+          <p>
+            Receive a clean set of paths with assumptions, second-order effects, and “if-then” logic, 
+            so you can choose with confidence.
+          </p>
+        </div>
+
+        <div class="step">
+          <div class="step-top">
+            <div class="kicker">Step 3</div>
+            <div class="pill">Execution</div>
+          </div>
+          <h3>Walk out with a next-step plan</h3>
+          <p>
+            Turn the decision into immediate action: what to build next, what to say, who to contact,
+            and what to stop doing,  with a short sprint plan.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEMO -->
     <section class="section" id="demo">
       <div class="section-head">
         <div>
-          <h2>Demo Video</h2>
+          <h2>Demo</h2>
           <p class="hint">Watch the Mentorra walkthrough.</p>
         </div>
       </div>
@@ -373,7 +894,6 @@
         <div class="video-shell">
           <iframe
             class="video"
-            id="youtubeEmbed"
             src="https://www.youtube.com/embed/JVLMC7Upe6Q"
             title="Mentorra Demo Video"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -381,38 +901,67 @@
           ></iframe>
           <div class="video-note">
             <span>Live demo video loaded.</span>
-            <button class="btn" id="copyVideoTip">Copy link</button>
+            <button class="btn" id="copyVideoTip" type="button">Copy link</button>
           </div>
         </div>
 
-        <div class="card pad" id="resources">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;">
-            <strong style="font-weight:760;letter-spacing:-0.02em;">Resources</strong>
-            <span class="tag">Quick links</span>
+        <div class="card pad">
+          <div class="mentor-panel-head">
+            <strong>Boardroom Overview</strong>
           </div>
 
-          <p style="margin:0;color:rgba(17,24,39,.70);font-size:13px;line-height:1.55;">
-            Everything in one place: repo, deck, docs. Update links when ready.
+          <p class="mentor-panel-sub">
+            Preview a few mentor personas available right now. Use arrows to browse.
           </p>
 
-          <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-            <a class="btn" id="pitchDeckLink" href="https://YOUR_PITCH_DECK_LINK_HERE" target="_blank" rel="noreferrer">
-              Pitch Deck
-            </a>
-            <a class="btn" id="docsLink" href="https://YOUR_DOCS_LINK_HERE" target="_blank" rel="noreferrer">
-              Docs / README
-            </a>
-            <a class="btn" id="contactLink" href="mailto:hello@mentorra.xyz">
-              Contact
-            </a>
+          <div class="carousel" aria-label="Mentor carousel">
+            <button class="arrow left" id="mentorLeft" type="button" aria-label="Previous mentor">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+            </button>
+            <button class="arrow right" id="mentorRight" type="button" aria-label="Next mentor">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8.59 16.59 1.41 1.41 6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+            </button>
+
+            <div class="track" id="mentorTrack">
+              <div class="slide" data-href="/Demo/">
+                <img class="mphoto" src="https://mentorra.xyz/Mentors/vincent-forge.png" alt="Vincent Forge" />
+                <div class="minfo">
+                  <p class="mname">Vincent Forge</p>
+                  <p class="marche">The Impossible Builder</p>
+                  <p class="mquote">“Make the impossible inevitable through first principles and relentless execution.”</p>
+                </div>
+              </div>
+
+              <div class="slide" data-href="/Demo/">
+                <img class="mphoto" src="https://mentorra.xyz/Mentors/adrian-insight.png" alt="Adrian Insight" />
+                <div class="minfo">
+                  <p class="mname">Adrian Insight</p>
+                  <p class="marche">The Startup Sage</p>
+                  <p class="mquote">“Make something people want, everything else is noise.”</p>
+                </div>
+              </div>
+
+              <div class="slide" data-href="/Demo/">
+                <img class="mphoto" src="https://mentorra.xyz/Mentors/katerina-catalyst.png" alt="Katerina Catalyst" />
+                <div class="minfo">
+                  <p class="mname">Katerina Catalyst</p>
+                  <p class="marche">The Scrappy Disruptor</p>
+                  <p class="mquote">“Turn your struggles into your advantage—bootstrap, hustle, believe.”</p>
+                </div>
+              </div>
+
+              <div class="slide" data-href="/Demo/">
+                <img class="mphoto" src="https://mentorra.xyz/Mentors/sophia-architect.png" alt="Sophia Architect" />
+                <div class="minfo">
+                  <p class="mname">Sophia Architect</p>
+                  <p class="marche">The Experience Designer</p>
+                  <p class="mquote">“Design experiences people love, not just products they use.”</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
-            <a href="/Demo/" class="btn primary">Try the Demo</a>
-            <a class="btn" href="https://github.com/YannDavidson/mentorrahackaton" target="_blank" rel="noreferrer">View on GitHub</a>
-          </div>
-
-          <div style="margin-top:16px; padding:12px 12px; border-radius:16px; border:1px solid var(--line); background: rgba(255,255,255,.60); color: rgba(17,24,39,.74); font-size:13px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+          <div class="res-meta">
             <span><b>Demo Mode:</b> ready</span>
             <span><b>Best used:</b> on desktop</span>
           </div>
@@ -420,12 +969,139 @@
       </div>
     </section>
 
+    <!-- PRICING -->
+    <section class="section" id="pricing">
+      <div class="section-head">
+        <div>
+          <h2>Pricing</h2>
+          <p class="hint">Start free. Upgrade when you want more sessions, more speed, and more leverage.</p>
+        </div>
+      </div>
+
+      <div class="pricing">
+        <div class="tier">
+          <div class="tier-glow" aria-hidden="true"></div>
+          <div class="tier-inner">
+            <div class="badge"><i aria-hidden="true"></i> Starter</div>
+            <div class="tier-top">
+              <div>
+                <h3>Starter</h3>
+                <p class="blurb">Explore the boardroom and test the flow.</p>
+              </div>
+              <div class="price">$0</div>
+            </div>
+            <div class="divider" aria-hidden="true"></div>
+            <div class="grow">
+              <ul class="feat">
+                <li>Mentor previews + sample decision flows</li>
+                <li>Founder baseline intake</li>
+                <li>Action plan preview</li>
+              </ul>
+            </div>
+            <a class="btn ghost full" href="/Demo/">Get started</a>
+          </div>
+        </div>
+
+        <div class="tier featured">
+          <div class="tier-inner">
+            <div class="badge popular"><i aria-hidden="true"></i> Popular</div>
+            <div class="tier-top">
+              <div>
+                <h3>Personal Monthly</h3>
+                <p class="blurb">For one person. 10 sessions to stay moving.</p>
+              </div>
+              <div class="price">$19/mo</div>
+            </div>
+            <div class="divider" aria-hidden="true"></div>
+            <div class="grow">
+              <ul class="feat">
+                <li>1 person</li>
+                <li><b>10 sessions</b> included / month</li>
+                <li>Decision templates + action sprints</li>
+              </ul>
+            </div>
+            <a class="btn primary full" href="#early">Get access</a>
+          </div>
+        </div>
+
+        <div class="tier">
+          <div class="tier-glow" aria-hidden="true"></div>
+          <div class="tier-inner">
+            <div class="badge"><i aria-hidden="true"></i> Extra</div>
+            <div class="tier-top">
+              <div>
+                <h3>Extra Monthly</h3>
+                <p class="blurb">For one person. Unlimited sessions.</p>
+              </div>
+              <div class="price">$49/mo</div>
+            </div>
+            <div class="divider" aria-hidden="true"></div>
+            <div class="grow">
+              <ul class="feat">
+                <li>1 person</li>
+                <li><b>Unlimited sessions</b></li>
+                <li>Faster iteration + deeper dives</li>
+              </ul>
+            </div>
+            <a class="btn ghost full" href="#early">Get access</a>
+          </div>
+        </div>
+
+        <div class="tier">
+          <div class="tier-glow" aria-hidden="true"></div>
+          <div class="tier-inner">
+            <div class="badge"><i aria-hidden="true"></i> Operator</div>
+            <div class="tier-top">
+              <div>
+                <h3>Operator</h3>
+                <p class="blurb">Unlimited everything + weekly momentum.</p>
+              </div>
+              <div class="price">$249/mo</div>
+            </div>
+            <div class="divider" aria-hidden="true"></div>
+            <div class="grow">
+              <ul class="feat">
+                <li>Unlimited mentor conversations</li>
+                <li>Weekly checkpoint + accountability</li>
+                <li>Fundraising narrative + GTM refinement</li>
+              </ul>
+            </div>
+            <a class="btn ghost full" href="#early">Get access</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EARLY ACCESS -->
+    <section class="section" id="early">
+      <div class="early-surface">
+        <div class="early">
+          <div class="early-head">
+            <div class="early-left">
+              <div class="k">Get early access</div>
+              <h3>Founders, you go first.</h3>
+              <p class="one-line">Drop your email. We’ll send details, launch timeline, and priority pricing. No spam, only leverage.</p>
+            </div>
+
+            <form class="emailbar" id="earlyForm" aria-label="Early access email capture">
+              <input id="email" type="email" placeholder="you@startup.com" required />
+              <button class="btn primary" type="submit">Get access</button>
+            </form>
+          </div>
+
+          
+        </div>
+      </div>
+    </section>
+
     <footer>
       <div class="foot">
-        <div>© <span id="year"></span> Mentorra. World-class mentorship, on demand. All rights reserved.</div>
+        <div>© <span id="year"></span> Mentorra. Decision infrastructure for builders. All rights reserved.</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <a href="#how">How it works</a>
           <a href="#demo">Demo</a>
-          <a href="#resources">Resources</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#early">Early access</a>
           <a href="https://github.com/YannDavidson/mentorrahackaton" target="_blank" rel="noreferrer">GitHub</a>
         </div>
       </div>
@@ -433,13 +1109,18 @@
 
   </main>
 
-  <!-- ✅ Single ElevenLabs ConvAI widget (popup / launcher) -->
+  <!-- ✅ ElevenLabs ConvAI widget -->
   <elevenlabs-convai agent-id="agent_1701kgb25h08et5rmczn7zd991v5"></elevenlabs-convai>
   <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
 
+  <!-- ✅ EmailJS library (UPDATED) -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
   <script>
+    // Year
     document.getElementById("year").textContent = new Date().getFullYear();
 
+    // Copy video link
     document.getElementById("copyVideoTip").addEventListener("click", async () => {
       const link = "https://youtu.be/JVLMC7Upe6Q";
       try{
@@ -447,6 +1128,113 @@
         alert("Copied: " + link);
       } catch {
         alert(link);
+      }
+    });
+
+    // Mentor carousel arrows + click-to-open
+    (function () {
+      const track = document.getElementById("mentorTrack");
+      const left = document.getElementById("mentorLeft");
+      const right = document.getElementById("mentorRight");
+      if (!track || !left || !right) return;
+
+      const slides = Array.from(track.querySelectorAll(".slide"));
+      if (!slides.length) return;
+
+      slides.forEach((s) => {
+        s.addEventListener("click", () => {
+          const href = s.getAttribute("data-href");
+          if (href) window.location.href = href;
+        });
+      });
+
+      function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+
+      function getActiveIndex() {
+        const viewportCenter = track.scrollLeft + track.clientWidth / 2;
+        let bestIndex = 0, bestDist = Infinity;
+
+        slides.forEach((slide, i) => {
+          const slideCenter = slide.offsetLeft + slide.clientWidth / 2;
+          const dist = Math.abs(slideCenter - viewportCenter);
+          if (dist < bestDist) { bestDist = dist; bestIndex = i; }
+        });
+
+        return bestIndex;
+      }
+
+      function scrollToIndex(i) {
+        const idx = clamp(i, 0, slides.length - 1);
+        const slide = slides[idx];
+        if (!slide) return;
+        track.scrollTo({ left: slide.offsetLeft, behavior: "smooth" });
+      }
+
+      left.addEventListener("click", (e) => {
+        e.preventDefault();
+        scrollToIndex(getActiveIndex() - 1);
+      });
+
+      right.addEventListener("click", (e) => {
+        e.preventDefault();
+        scrollToIndex(getActiveIndex() + 1);
+      });
+
+      // Keyboard arrows when focused
+      track.setAttribute("tabindex", "0");
+      track.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") scrollToIndex(getActiveIndex() - 1);
+        if (e.key === "ArrowRight") scrollToIndex(getActiveIndex() + 1);
+      });
+    })();
+
+    // ✅ EmailJS init (YOUR KEYS)
+    (function () {
+      emailjs.init("Z-OpZxiwjLWlwWtHh");
+    })();
+
+    // ✅ Early access capture (EmailJS)
+    document.getElementById("earlyForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const input = document.getElementById("email");
+      const email = (input.value || "").trim();
+      if (!email) return;
+
+      // basic email sanity check
+      const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!ok) {
+        alert("Please enter a valid email.");
+        input.focus();
+        return;
+      }
+
+      const btn = e.currentTarget.querySelector('button[type="submit"]');
+      const prev = btn ? btn.textContent : "";
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Sending…";
+      }
+
+      const params = {
+        email,
+        page: window.location.href,
+        time: new Date().toLocaleString(),
+        user_agent: navigator.userAgent,
+      };
+
+      try {
+        await emailjs.send("service_wb0xioh", "template_qi8kaw6", params);
+        alert("You're on the list. We’ll reach out soon.");
+        input.value = "";
+      } catch (err) {
+        console.error("EmailJS error:", err);
+        alert("Couldn’t submit right now. Please email contact@mentorra.xyz.");
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = prev || "Get access";
+        }
       }
     });
   </script>
