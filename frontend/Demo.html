@@ -306,11 +306,69 @@
 
     /* --- Boardroom Widget --- */
     .agent-wrap {
-      margin-top: 18px;
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 900;
       display: flex;
-      justify-content: center;
+      justify-content: flex-end;
+      align-items: flex-end;
+      pointer-events: none;
     }
 
+    .agent-widget-shell {
+      pointer-events: auto;
+      width: 360px;
+      max-width: calc(100vw - 32px);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .boardroom-bubble {
+      appearance: none;
+      border: 1px solid #111;
+      background: #111;
+      color: #fff;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 120ms ease, opacity 120ms ease;
+    }
+
+    .boardroom-bubble:hover { transform: translateY(-1px); }
+    .boardroom-bubble:active { transform: translateY(0); opacity: 0.92; }
+
+    .boardroom-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #34d399;
+      box-shadow: 0 0 0 4px rgba(52,211,153,0.18);
+      flex: 0 0 auto;
+    }
+
+    .widget-panel {
+      width: 100%;
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+      transform-origin: bottom right;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .widget-panel.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
     .agent-card {
       width: 100%;
       max-width: 760px;
@@ -416,6 +474,211 @@
     }
 
     .bottom-space { height: 26px; }
+
+    .modal.hidden {
+  display: none;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.modal-card {
+  position: relative;
+  width: min(560px, calc(100% - 32px));
+  margin: 10vh auto 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.16);
+  padding: 24px;
+  z-index: 1001;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: 0;
+  background: transparent;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.modal-eyebrow {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.modal-card h2 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.modal-copy {
+  margin: 0 0 16px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.modal-textarea {
+  width: 100%;
+  min-height: 140px;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 14px;
+  outline: none;
+  background: #fafafa;
+}
+
+.modal-textarea:focus {
+  border-color: #111;
+  background: #fff;
+}
+
+.modal-actions {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.modal-status {
+  min-height: 20px;
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.router-mode-toggle {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0 14px 0;
+  background: #eef2f8;
+  padding: 6px;
+  border-radius: 999px;
+  width: fit-content;
+}
+
+.router-mode-btn {
+  border: none;
+  background: transparent;
+  padding: 10px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.router-mode-btn.active {
+  background: #111827;
+  color: white;
+}
+
+.router-chat-messages {
+  max-height: 260px;
+  min-height: 180px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  margin: 8px 0 16px 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #fafbfd;
+}
+
+.router-message {
+  display: flex;
+  width: 100%;
+}
+
+.router-message.user {
+  justify-content: flex-end;
+}
+
+.router-message.assistant {
+  justify-content: flex-start;
+}
+
+.router-bubble {
+  max-width: 82%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.router-message.user .router-bubble {
+  background: #111827;
+  color: white;
+  border-bottom-right-radius: 6px;
+}
+
+.router-message.assistant .router-bubble {
+  background: #e9eef7;
+  color: #111827;
+  border-bottom-left-radius: 6px;
+}
+
+.router-input-area {
+  margin-top: 6px;
+}
+
+.router-controls-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.router-controls-panel.hidden {
+  display: none;
+}
+
+.router-mic-btn {
+  width: 72px;
+  height: 72px;
+  border: none;
+  border-radius: 50%;
+  background: #111827;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.router-mic-btn.recording {
+  transform: scale(1.05);
+}
+
+.router-mic-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.hidden {
+  display: none;
+}
 
     /* Responsive */
     @media (max-width: 980px) {
@@ -706,28 +969,93 @@
         </div>
       </section>
 
-      <!-- Boardroom widget -->
-      <div class="agent-wrap" id="boardroom">
-        <div class="agent-card">
-          <div class="agent-top">
-            <p class="agent-title">Your Boardroom is ready</p>
-            <div class="selected-pill">Selected: <span id="selectedCount">0</span></div>
+    
+
+          <!-- Router help / boardroom actions -->
+<div class="agent-wrap" id="boardroom">
+  <div class="agent-widget-shell">
+    <button class="boardroom-bubble" id="boardroomBubbleBtn" type="button" aria-expanded="false" aria-controls="boardroomPanel">
+      <span class="boardroom-dot" aria-hidden="true"></span>
+      <span>Boardroom</span>
+    </button>
+
+    <div class="widget-panel" id="boardroomPanel">
+      <div class="agent-card">
+        <div class="agent-top">
+          <p class="agent-title">Build your boardroom</p>
+          <div class="selected-pill">Selected: <span id="selectedCount">0</span></div>
+        </div>
+
+        <p class="agent-subtitle" id="sessionSubtitle">
+          Select one or more mentors above, or let the router help choose for you.
+        </p>
+
+        <div class="actions">
+          <button class="btn" id="routerHelpBtn" type="button">Help Me Choose</button>
+          <button class="btn" id="textBtn" type="button" disabled>Text Session</button>
+          <button class="btn primary" id="startBtn" type="button" disabled>Start Session</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <p class="agent-subtitle" style="margin-top:12px">
+          Router can suggest the best mentor based on the user's situation.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Router modal -->
+    <div class="modal hidden" id="routerModal" aria-hidden="true">
+      <div class="modal-backdrop" id="routerModalBackdrop"></div>
+
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="routerModalTitle">
+        <button class="modal-close" id="routerModalClose" type="button" aria-label="Close">×</button>
+
+        <p class="modal-eyebrow">Mentor Router</p>
+        <h2 id="routerModalTitle">Need help choosing the right mentor?</h2>
+        <p class="modal-copy">
+          Tell us what you need help with and the router will suggest the best mentors for your boardroom.
+        </p>
+
+        <div class="router-mode-toggle" id="routerModeToggle">
+          <button id="routerVoiceModeBtn" class="router-mode-btn active" type="button">Voice</button>
+          <button id="routerTextModeBtn" class="router-mode-btn" type="button">Text</button>
+        </div>
+
+        <div id="routerChatMessages" class="router-chat-messages">
+          <div class="router-message assistant">
+            <div class="router-bubble">
+              Hi — I can help suggest the right mentor. In voice mode, tap the microphone and tell me what kind of help you need.
+            </div>
+          </div>
+        </div>
+
+        <div class="router-input-area">
+          <div id="routerVoiceControls" class="router-controls-panel">
+            <button id="routerMicBtn" class="router-mic-btn" type="button" aria-label="Start voice input">🎤</button>
+            <p id="routerVoiceStatus" class="modal-status">Voice mode is on. Tap the microphone to speak.</p>
           </div>
 
-          <p class="agent-subtitle" id="sessionSubtitle">
-            Select one or more mentors above, then start a session.
-          </p>
+          <div id="routerTextControls" class="router-controls-panel hidden">
+            <textarea
+              id="routerPrompt"
+              class="modal-textarea"
+              placeholder="Example: I need help deciding whether to focus on customer discovery, product strategy, or fast execution."
+            ></textarea>
 
-          <div class="actions">
-            <button class="btn" id="textBtn" type="button" disabled>Text Session</button>
-            <button class="btn primary" id="startBtn" type="button" disabled>Start Session</button>
+            <div class="modal-actions">
+              <button class="btn" id="routerCancelBtn" type="button">Cancel</button>
+              <button class="btn primary" id="routerSubmitBtn" type="button">Suggest Mentors</button>
+            </div>
           </div>
-
-          <div class="divider"></div>
-
-          <!-- Voice boardroom placeholder (single widget for now) -->
-          <elevenlabs-convai agent-id="agent_6101kgb383vpfds9h979hrrg9h0k"></elevenlabs-convai>
-          <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+        </div>
+      </div>
+    </div>
+    <script>
+      
+    </script>
 
           <p class="agent-subtitle" style="margin-top:12px">
             Powered by ElevenLabs Agents • Voice-first by default • Privacy-first
@@ -750,124 +1078,480 @@
   </main>
 
   <script>
-    // Selection state
-    const selected = new Map(); // id -> name
+  // Selection state
+  const selected = new Map();
 
-    const selectedCountEl = document.getElementById("selectedCount");
-    const sessionSubtitle = document.getElementById("sessionSubtitle");
-    const startBtn = document.getElementById("startBtn");
-    const textBtn = document.getElementById("textBtn");
+  const selectedCountEl = document.getElementById("selectedCount");
+  const sessionSubtitle = document.getElementById("sessionSubtitle");
+  const startBtn = document.getElementById("startBtn");
+  const textBtn = document.getElementById("textBtn");
+  const boardroomBubbleBtn = document.getElementById("boardroomBubbleBtn");
+  const boardroomPanel = document.getElementById("boardroomPanel");  
 
-    // Toggle + update UI
-    function updateUI() {
-      const n = selected.size;
-      selectedCountEl.textContent = String(n);
+  const routerHelpBtn = document.getElementById("routerHelpBtn");
+  const routerModal = document.getElementById("routerModal");
+  const routerModalBackdrop = document.getElementById("routerModalBackdrop");
+  const routerModalClose = document.getElementById("routerModalClose");
+  const routerCancelBtn = document.getElementById("routerCancelBtn");
+  const routerSubmitBtn = document.getElementById("routerSubmitBtn");
+  const routerPrompt = document.getElementById("routerPrompt");
+  const routerStatus = document.getElementById("routerStatus");
+  const routerVoiceModeBtn = document.getElementById("routerVoiceModeBtn");
+  const routerTextModeBtn = document.getElementById("routerTextModeBtn");
+  const routerVoiceControls = document.getElementById("routerVoiceControls");
+  const routerTextControls = document.getElementById("routerTextControls");
+  const routerMicBtn = document.getElementById("routerMicBtn");
+  const routerVoiceStatus = document.getElementById("routerVoiceStatus");
+  const routerChatMessages = document.getElementById("routerChatMessages");
 
-      startBtn.disabled = n === 0;
-      textBtn.disabled = n === 0;
+  let routerMode = "voice";
+  let routerMediaRecorder = null;
+  let routerAudioChunks = [];
+  let routerIsRecording = false;
+  let routerSessionId = crypto.randomUUID();
 
-      if (n === 0) {
-        sessionSubtitle.textContent = "Select one or more mentors above, then start a session.";
-        return;
-      }
-      const names = Array.from(selected.values());
-      const shown = names.slice(0, 2).join(", ");
-      const tail = n > 2 ? ` +${n - 2} more` : "";
-      sessionSubtitle.innerHTML =
-        `Selected: <strong>${shown}${tail}</strong>. Click <strong>Start Session</strong> for voice or <strong>Text Session</strong> for text.`;
+
+
+  function updateUI() {
+    const n = selected.size;
+    selectedCountEl.textContent = String(n);
+
+    startBtn.disabled = n === 0;
+    textBtn.disabled = n === 0;
+
+    if (n === 0) {
+      sessionSubtitle.textContent = "Select one or more mentors above, or let the router help choose for you.";
+      return;
     }
 
-    function toggleMentor(flipEl) {
-      const id = flipEl.getAttribute("data-id");
-      const name = flipEl.getAttribute("data-name") || id;
+    const names = Array.from(selected.values());
+    const shown = names.slice(0, 2).join(", ");
+    const tail = n > 2 ? ` +${n - 2} more` : "";
 
-      if (selected.has(id)) {
-        selected.delete(id);
-        flipEl.classList.remove("selected");
-        flipEl.querySelectorAll(".select-btn").forEach(b => b.textContent = "Select Mentor");
-      } else {
-        selected.set(id, name);
-        flipEl.classList.add("selected");
-        flipEl.querySelectorAll(".select-btn").forEach(b => b.textContent = "Selected ✓");
-      }
-      updateUI();
-    }
+    sessionSubtitle.innerHTML =
+      `Selected: <strong>${shown}${tail}</strong>. Click <strong>Start Session</strong> for voice or <strong>Text Session</strong> for text.`;
+  }
 
-    function bindMentorCards(scope) {
-      const flips = (scope || document).querySelectorAll(".flip");
+  function setMentorSelected(flipEl, shouldSelect) {
+    const id = flipEl.getAttribute("data-id");
+    const name = flipEl.getAttribute("data-name") || id;
 
-      flips.forEach(flip => {
-        // Avoid double-binding if panel toggled repeatedly
-        if (flip.dataset.bound === "1") return;
-        flip.dataset.bound = "1";
-
-        flip.addEventListener("click", (e) => {
-          const isBtn = e.target && e.target.classList && e.target.classList.contains("select-btn");
-          if (isBtn || e.currentTarget.contains(e.target)) toggleMentor(flip);
-        });
-
-        flip.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            toggleMentor(flip);
-          }
-        });
+    if (shouldSelect) {
+      selected.set(id, name);
+      flipEl.classList.add("selected");
+      flipEl.querySelectorAll(".select-btn").forEach(btn => {
+        btn.textContent = "Selected ✓";
+      });
+    } else {
+      selected.delete(id);
+      flipEl.classList.remove("selected");
+      flipEl.querySelectorAll(".select-btn").forEach(btn => {
+        btn.textContent = "Select Mentor";
       });
     }
+  }
 
-    bindMentorCards(document);
-
-    function selectedIdsCSV() {
-      return Array.from(selected.keys()).join(",");
-    }
-
-    startBtn.addEventListener("click", () => {
-  const mentors = selectedIdsCSV();
-  if (!mentors) return;
-
-  window.location.href =
-    `https://mentorra.xyz/Boardrooms/?mentors=${encodeURIComponent(mentors)}`;
-});
-
-textBtn.addEventListener("click", () => {
-  const mentors = selectedIdsCSV();
-  if (!mentors) return;
-
-  window.location.href =
-    `https://mentorra.xyz/Boardrooms/?mode=text&mentors=${encodeURIComponent(mentors)}`;
-});
-
-
-    // --- Expand/Collapse "More mentors" panel ---
-    const moreBtn = document.getElementById("moreMentorsBtn");
-    const morePanel = document.getElementById("morePanel");
-
-    function openMore() {
-      morePanel.classList.add("open");
-      moreBtn.setAttribute("aria-expanded", "true");
-      // Ensure event handlers are bound inside panel
-      bindMentorCards(morePanel);
-      // Smooth scroll to panel for nice UX
-      morePanel.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-
-    function closeMore() {
-      morePanel.classList.remove("open");
-      moreBtn.setAttribute("aria-expanded", "false");
-    }
-
-    moreBtn.addEventListener("click", () => {
-      const isOpen = morePanel.classList.contains("open");
-      if (isOpen) closeMore();
-      else openMore();
-    });
-
-    // Close panel with ESC for better UX
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && morePanel.classList.contains("open")) closeMore();
-    });
-
+  function toggleMentor(flipEl) {
+    const id = flipEl.getAttribute("data-id");
+    setMentorSelected(flipEl, !selected.has(id));
     updateUI();
-  </script>
+  }
+
+  function bindMentorCards(scope) {
+    const flips = (scope || document).querySelectorAll(".flip");
+
+    flips.forEach(flip => {
+      if (flip.dataset.bound === "1") return;
+      flip.dataset.bound = "1";
+
+      flip.addEventListener("click", (e) => {
+        const isBtn = e.target?.classList?.contains("select-btn");
+        if (isBtn || e.currentTarget.contains(e.target)) {
+          toggleMentor(flip);
+        }
+      });
+
+      flip.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggleMentor(flip);
+        }
+      });
+    });
+  }
+
+  function openBoardroomPanel() {
+    boardroomPanel.classList.add("open");
+    boardroomBubbleBtn.setAttribute("aria-expanded", "true");
+  }
+
+  function closeBoardroomPanel() {
+    boardroomPanel.classList.remove("open");
+    boardroomBubbleBtn.setAttribute("aria-expanded", "false");
+  }
+
+  function toggleBoardroomPanel() {
+    const isOpen = boardroomPanel.classList.contains("open");
+    if (isOpen) closeBoardroomPanel();
+    else openBoardroomPanel();
+  }
+  function openRouterModal() {
+    openBoardroomPanel();
+    routerModal.classList.remove("hidden");
+    routerModal.setAttribute("aria-hidden", "false");
+    routerStatus.textContent = "";
+    setRouterMode("voice");
+    setTimeout(() => routerPrompt.focus(), 0);
+  }
+
+  function closeRouterModal() {
+    routerModal.classList.add("hidden");
+    routerModal.setAttribute("aria-hidden", "true");
+    routerStatus.textContent = "";
+  }
+
+  function normalizeAgentName(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, " ");
+  }
+
+  function findMentorCardByAgentName(agentName) {
+    const normalizedTarget = normalizeAgentName(agentName);
+    const cards = document.querySelectorAll(".flip");
+
+    for (const card of cards) {
+      const dataName = normalizeAgentName(card.dataset.name);
+      const mentorName = normalizeAgentName(
+        card.querySelector(".mentor-name")?.textContent || ""
+      );
+      const dataId = normalizeAgentName(card.dataset.id);
+
+      if (
+        normalizedTarget === dataName ||
+        normalizedTarget === mentorName ||
+        normalizedTarget === dataId
+      ) {
+        return card;
+      }
+    }
+
+    return null;
+  }
+
+  function clearAllSelections() {
+  document.querySelectorAll(".flip.selected").forEach(card => {
+    setMentorSelected(card, false);
+  });
+  updateUI();
+}
+
+function applySuggestedAgents(agentNames) {
+  if (!Array.isArray(agentNames)) return;
+
+  clearAllSelections();
+
+  let matched = 0;
+  agentNames.forEach((name) => {
+    const card = findMentorCardByAgentName(name);
+    if (card) {
+      setMentorSelected(card, true);
+      matched += 1;
+    }
+  });
+
+  updateUI();
+
+  if (matched > 0) {
+    closeRouterModal();
+  } else {
+    routerStatus.textContent = "No matching mentors were found in the current boardroom.";
+  }
+}
+
+
+async function bootstrapSession(mode) {
+  const mentors = selectedIdsCSV();
+  if (!mentors) return;
+
+  const prompt = routerPrompt.value.trim();
+
+  const payload = {
+    session_id: `session-${Date.now()}`,
+    mode: mode,
+    active_mentor_track: Array.from(selected.values())[0] || null,
+    memory_context: "",
+    founder_profile: null,
+    selected_agents: Array.from(selected.values())
+  };
+
+  if (mode === "text") {
+    payload.user_message = prompt || `Start a text mentor session with ${mentors}`;
+  } else {
+    // for now voice mode still sends text until mic capture is wired up
+    payload.user_message = prompt || `Start a voice mentor session with ${mentors}`;
+  }
+
+  const response = await fetch("/api/assist", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Session bootstrap failed with status ${response.status}`);
+  }
+
+  return response.json();
+}
+
+
+
+  async function submitRouterTextMessage() {
+  const prompt = routerPrompt.value.trim();
+  if (!prompt) return;
+
+  addRouterMessage("user", prompt);
+  routerPrompt.value = "";
+  setRouterLoadingState("Thinking...");
+
+  try {
+    const response = await fetch("http://localhost:8000/api/assist", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        session_id: routerSessionId,
+        mode: "text",
+        user_message: prompt
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.detail || "Router request failed");
+    }
+
+    if (data.reply) {
+      addRouterMessage("assistant", data.reply);
+    }
+  } catch (error) {
+    addRouterMessage("assistant", `Error: ${error.message}`);
+  } finally {
+    clearRouterLoadingState();
+  }
+}
+
+function selectedIdsCSV() {
+  return Array.from(selected.keys()).join(",");
+}
+
+async function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(String(reader.result || ""));
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+function setRouterMode(mode) {
+  routerMode = mode;
+
+  if (mode === "voice") {
+    routerVoiceModeBtn.classList.add("active");
+    routerTextModeBtn.classList.remove("active");
+    routerVoiceControls.classList.remove("hidden");
+    routerTextControls.classList.add("hidden");
+    routerVoiceStatus.textContent = "Voice mode is on. Tap the microphone to speak.";
+  } else {
+    routerTextModeBtn.classList.add("active");
+    routerVoiceModeBtn.classList.remove("active");
+    routerTextControls.classList.remove("hidden");
+    routerVoiceControls.classList.add("hidden");
+  }
+}
+
+function addRouterMessage(role, text) {
+  const wrapper = document.createElement("div");
+  wrapper.className = `router-message ${role}`;
+
+  const bubble = document.createElement("div");
+  bubble.className = "router-bubble";
+  bubble.textContent = text;
+
+  wrapper.appendChild(bubble);
+  routerChatMessages.appendChild(wrapper);
+  routerChatMessages.scrollTop = routerChatMessages.scrollHeight;
+}
+
+function setRouterLoadingState(statusText) {
+  if (routerVoiceStatus) routerVoiceStatus.textContent = statusText;
+  if (routerMicBtn) routerMicBtn.disabled = true;
+  if (routerSubmitBtn) routerSubmitBtn.disabled = true;
+  if (routerPrompt) routerPrompt.disabled = true;
+}
+
+function clearRouterLoadingState() {
+  if (routerMicBtn) routerMicBtn.disabled = false;
+  if (routerSubmitBtn) routerSubmitBtn.disabled = false;
+  if (routerPrompt) routerPrompt.disabled = false;
+
+  if (routerMode === "voice" && routerVoiceStatus) {
+    routerVoiceStatus.textContent = "Voice mode is on. Tap the microphone to speak.";
+  }
+}
+
+function routerBlobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result;
+      resolve(result.split(",")[1]);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function startRouterRecording() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    addRouterMessage("assistant", "Voice recording is not supported in this browser.");
+    return;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    routerMediaRecorder = new MediaRecorder(stream);
+    routerAudioChunks = [];
+
+    routerMediaRecorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        routerAudioChunks.push(event.data);
+      }
+    };
+
+    routerMediaRecorder.onstop = async () => {
+      const mimeType = routerMediaRecorder.mimeType || "audio/webm";
+      const audioBlob = new Blob(routerAudioChunks, { type: mimeType });
+      await submitRouterVoiceMessage(audioBlob, mimeType);
+      stream.getTracks().forEach(track => track.stop());
+    };
+
+    routerMediaRecorder.start();
+    routerIsRecording = true;
+    routerMicBtn.classList.add("recording");
+    routerVoiceStatus.textContent = "Listening...";
+  } catch (error) {
+    addRouterMessage("assistant", "Could not access microphone.");
+  }
+}
+
+function stopRouterRecording() {
+  if (routerMediaRecorder && routerIsRecording) {
+    routerMediaRecorder.stop();
+    routerIsRecording = false;
+    routerMicBtn.classList.remove("recording");
+    routerVoiceStatus.textContent = "Transcribing...";
+  }
+}
+
+async function submitRouterVoiceMessage(audioBlob, mimeType) {
+  setRouterLoadingState("Transcribing and thinking...");
+
+  try {
+    const audioBase64 = await routerBlobToBase64(audioBlob);
+
+    const response = await fetch("http://localhost:8000/api/assist", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        session_id: routerSessionId,
+        mode: "voice",
+        audio_base64: audioBase64,
+        audio_mime_type: mimeType
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.detail || "Voice router request failed");
+    }
+
+    if (data.transcript) {
+      addRouterMessage("user", data.transcript);
+    }
+
+    if (data.reply) {
+      addRouterMessage("assistant", data.reply);
+    }
+
+    if (data.audio_base64) {
+      const audio = new Audio(`data:${data.audio_mime_type || "audio/mpeg"};base64,${data.audio_base64}`);
+      audio.play().catch(() => {});
+    }
+  } catch (error) {
+    addRouterMessage("assistant", `Error: ${error.message}`);
+  } finally {
+    clearRouterLoadingState();
+  }
+}
+
+  boardroomBubbleBtn.addEventListener("click", toggleBoardroomPanel);
+  routerHelpBtn?.addEventListener("click", openRouterModal);
+  routerModalClose?.addEventListener("click", closeRouterModal);
+  routerCancelBtn?.addEventListener("click", closeRouterModal);
+  routerModalBackdrop?.addEventListener("click", closeRouterModal);
+  routerSubmitBtn.addEventListener("click", submitRouterTextMessage);
+  routerPrompt.addEventListener("keydown", (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+      submitRouterTextMessage();
+    }
+  });
+  routerVoiceModeBtn.addEventListener("click", () => setRouterMode("voice"));
+  routerTextModeBtn.addEventListener("click", () => setRouterMode("text"));
+
+  routerMicBtn.addEventListener("click", () => {
+  if (!routerIsRecording) {
+    startRouterRecording();
+  } else {
+    stopRouterRecording();
+  }
+});
+  // ensure no unpredictable behaviors with chained if statements.
+  document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+
+  if (!routerModal.classList.contains("hidden")) {
+    closeRouterModal();
+  } else if (morePanel.classList.contains("open")) {
+    closeMore();
+  } else if (boardroomPanel.classList.contains("open")) {
+    closeBoardroomPanel();
+  }
+});
+
+  document.addEventListener("click", (e) => {
+    const clickedInsideWidget = document.querySelector(".agent-widget-shell")?.contains(e.target);
+    const clickedInsideModal = routerModal.contains(e.target);
+
+    if (!clickedInsideWidget && !clickedInsideModal && boardroomPanel.classList.contains("open") && routerModal.classList.contains("hidden")) {
+      closeBoardroomPanel();
+    }
+  });
+
+  bindMentorCards(document);
+  updateUI();
+  closeBoardroomPanel();
+</script>
 </body>
 </html>
