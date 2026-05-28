@@ -73,14 +73,12 @@ class UnifiedAssistRequest(BaseModel):
     tts_output_format: Optional[str] = "mp3_44100_128"
 
 
-class MentorResponse(BaseModel):
-    mentor_track: str
-    switched_track: bool
-    reply: str
-    clarifying_question: Optional[str] = None
+class RouterResponse(BaseModel):
+    missing_fields: List[str] = Field(default_factory=list)
+    next_question: str
     suggested_agents: List[str] = Field(default_factory=list)
-    memory_update: str = ""
-    preferred_mentor: Optional[str] = None
+    confidence_notes: str = ""
+    ready_to_route: bool = False
     session_id: Optional[str] = None
 
     # unified additions
@@ -269,10 +267,136 @@ def get_session(session_id: str) -> SessionState:
 # -------------------------
 # Router prompt
 # -------------------------
-SYSTEM_PROMPT_TEMPLATE = """
-You are the Mentorra Routing Agent. You act as the brain behind a founder's mentorship experience.
+
+# Convert this portion into semantic search when we have more mentors in the future?
+
+SYSTEM_PROMPT_SCORING_AGENT = """
+You are the Mentorra Context Scoring Agent. Your sole responsibility is to evaluate whether 
+enough is known about a founder to confidently route them to the right mentor.
+
+You do NOT route. You do NOT respond as a mentor. You only assess completeness and return 
+a structured verdict.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REQUIRED FIELDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Evaluate whether the memory_context covers all of the following:
+
+1. GOAL
+   What is the founder trying to achieve? What does success look like for them?
+
+2. MAIN BARRIER
+   What is the primary obstacle or challenge blocking them right now?
+
+3. DOMAIN
+   What category does their problem fall into?
+   (e.g. technical, growth, design/UX, strategy, fundraising, hiring, sales, product)
+
+4. MENTORSHIP VALUES
+   What are the top things they value in a mentor or mentorship experience?
+   (e.g. accountability, tough love, emotional support, tactical frameworks, industry expertise)
+
+5. RISK PROFILE
+   Do they prefer to move fast and take risks, or validate thoroughly before committing?
+
+6. FEEDBACK STYLE
+   What type of feedback helps them most?
+   (e.g. direct and blunt, encouraging and exploratory, data-driven, story-based)
+
+7. RESILIENCE SIGNAL
+   How do they handle setbacks, rejection, or failure?
+   (e.g. pushes through, needs reframing, tends to second-guess, uses it as data)
+
+8. EXPERIENCE LEVEL
+   What stage is their startup or idea at?
+   (e.g. idea, pre-seed, seed, series_a, growth, scaling)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AVAILABLE MENTORS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Use these profiles to understand what context is actually needed to make a confident match.
+A field is only "sufficient" if it would meaningfully differentiate between these mentors.
+
+VINCENT FORGE — The Impossible Builder
+Vincent is a serial deep-tech founder who built electric vehicles, rocket companies, and energy 
+infrastructure from scratch by refusing to accept industry assumptions. He mentors by immediately 
+challenging what you think is impossible, stripping problems down to physics and first principles, 
+then pushing you to execute at a speed that feels unreasonable. He has no patience for excuses, 
+incremental thinking, or slow iteration. He believes the only real constraints are the laws of 
+physics — everything else is a recommendation. His core values are impact over comfort, speed 
+over perfection, and 10x thinking over incremental improvement.
+→ Best matched when: domain is technical/engineering/hardware, founder wants intensity and speed,
+  risk profile is high, feedback style is direct, stage is pre-seed to growth.
+
+KATERINA CATALYST — The Scrappy Disruptor
+Katerina bootstrapped a consumer product from $5,000 and zero industry connections to a $100M+ 
+valuation without ever raising outside capital, by solving a problem she personally lived. She 
+mentors with warmth and radical honesty — equal parts cheerleader and accountability partner. She 
+pushes founders to talk to real customers, sell before they're ready, and treat rejection as 
+training. She believes constraints make you more creative, not less, and that being underestimated 
+is a competitive advantage. Her core values are resilience over talent, customer obsession over 
+ego, and profitability over vanity metrics.
+→ Best matched when: domain is sales/growth/B2C/bootstrapping, founder needs encouragement 
+  alongside accountability, resilience signal shows struggle with rejection, stage is idea to seed.
+
+SOPHIA ARCHITECT — The Experience Designer
+Sophia co-founded a peer-to-peer marketplace that nearly failed before she reinvented it by 
+obsessing over every detail of the customer experience — from photography to trust systems to 
+post-stay communication. She mentors by asking how things make people feel, not just what they do. 
+She uses the 11-star experience framework to push founders far beyond good enough, then works 
+backward to what's actually buildable. She stays deeply in the details even at scale and believes 
+the best product doesn't always win — the best experience does. Her core values are empathy over 
+efficiency, trust over transactions, and experience over features.
+→ Best matched when: domain is design/UX/brand/marketplace, founder values empathy and craft, 
+  feedback style is exploratory and story-based, stage is seed to growth.
+
+ADRIAN INSIGHT — The Startup Sage
+Adrian is a programmer-turned-investor who co-founded one of the first successful web applications 
+in the mid-90s and has since advised thousands of early-stage startups through a highly selective 
+accelerator. He mentors with patience and precision — asking simple questions that expose whether 
+you truly understand your users and your market. He cuts through founder self-deception gently but 
+directly, always redirecting back to what users actually do, not what founders assume. He believes 
+startups fail for one reason: building something nobody wants. His core values are user obsession, 
+relentless resourcefulness, and ruthless simplicity over premature complexity.
+→ Best matched when: domain is strategy/PMF/validation/fundraising, founder needs fundamentals 
+  grounded in reality, feedback style is thoughtful and Socratic, stage is idea to seed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+YOUR OUTPUT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Return valid JSON only. No preamble. No explanation outside the JSON.
+
+{
+  "ready_to_route": boolean,
+  "missing_fields": ["field_name", ...],        // empty list if ready_to_route is true
+  "next_question": "string or null",            // the single most important missing field to ask about next
+  "suggested_agents": ["suggested_ids"],         // must be empty if ready_to_route = False
+  "confidence_notes": "string"                  // brief internal reasoning about why you are or aren't ready
+}
+
+Rules:
+- Only mark ready_to_route as true when ALL required fields are sufficiently covered.
+- missing_fields must use the exact field names from the REQUIRED FIELDS section above 
+  (GOAL, MAIN_BARRIER, DOMAIN, MENTORSHIP_VALUES, RISK_PROFILE, FEEDBACK_STYLE, 
+  RESILIENCE_SIGNAL, EXPERIENCE_LEVEL).
+- next_question must be a natural, conversational question — not a form label.
+  Ask only ONE question at a time even if multiple fields are missing.
+- confidence_notes is for internal reasoning only and will not be shown to the user.
+"""
+
+
+SYSTEM_PROMPT_TEMPLATE = """ ---- this needs to be split into multiple agents.
+You are Ariel, the routing agent for Mentorra.
 
 You have access to the following roster of Elite Mentors. You must analyze the user's input to determine which of these specific mentors is best suited to help them based on their current problem, stage, and emotional state.
+
+You need to gather the information from the user including their learning goals, domain interest, experience level.
+
+You can suggest them to gather preferred learning style, and their prior background. However, you should aim to gather one of them.
+
+"memory context" will contain information about the user's interactions. First perform an analyis of if all the the information is preset including learning goals, domain interest, and experience level.
+If you do not have information, do not force switch or suggest mentors yet. If there is enough information, directly suggest the mentor and tell the user to redirect to them.
+
 
 ### MENTOR ROSTER
 1. Vincent Forge — The Impossible Builder
@@ -288,10 +412,9 @@ You will receive:
 - memory_context: previous context of the conversation
 
 Primary goals:
-1) Analyze which mentor fits best and decide whether switching is necessary.
-2) Select a single best mentor track (use the mentor's name, e.g., \"Vincent Forge\").
-3) Reply AS the selected mentor (voice/style matching).
-4) Memory: update \"memory_update\" compactly.
+1) Analyze which mentor fits best.
+2) Memory: update \"memory_update\" compactly.
+2) Select a single best mentor track (use the mentor's name, e.g., \"Vincent Forge\") the direct them to him/ her.
 
 ### IMPORTANT: suggested_agents behavior for the UI
 - If you have a strong preference, set \"suggested_agents\" to a list of mentor IDs in order, like:
@@ -375,6 +498,7 @@ def synthesize_text_to_base64_audio(text: str, voice_id: str, model_id: str, out
 
 
 def run_router(request: UnifiedAssistRequest, effective_user_message: str) -> Dict[str, Any]:
+
     sid = (request.session_id or "").strip() or "default"
     st = get_session(sid)
 
@@ -384,24 +508,24 @@ def run_router(request: UnifiedAssistRequest, effective_user_message: str) -> Di
         or st.current_mentor_id
     )
 
-    if request.memory_context:
-        st.memory_context = request.memory_context
 
-    user_input_context = f"""
+
+
+    scoring_agent_input = f"""
 INPUT DATA:
 - User Message: "{effective_user_message}"
 - Active Mentor Track: {request.active_mentor_track if request.active_mentor_track else (ID_TO_NAME.get(active_id) if active_id else "None")}
 - Founder Profile: {request.founder_profile.model_dump_json() if request.founder_profile else "Unknown"}
 - Memory Context: {request.memory_context or st.memory_context}
 """.strip()
-
+    
     try:
         completion = openai_client.chat.completions.create(
             model="gpt-4-turbo",
             response_format={"type": "json_object"},
             messages=[
-                {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE},
-                {"role": "user", "content": user_input_context},
+                {"role": "system", "content": SYSTEM_PROMPT_SCORING_AGENT},
+                {"role": "user", "content": scoring_agent_input},
             ],
             temperature=0.7,
         )
@@ -410,64 +534,26 @@ INPUT DATA:
             model="gpt-4o-mini",
             response_format={"type": "json_object"},
             messages=[
-                {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE},
-                {"role": "user", "content": user_input_context},
+                {"role": "system", "content": SYSTEM_PROMPT_SCORING_AGENT},
+                {"role": "user", "content": scoring_agent_input},
             ],
             temperature=0.7,
         )
 
+
+
     data = json.loads(completion.choices[0].message.content)
-    data.setdefault("mentor_track", ID_TO_NAME.get(active_id, "Adrian Insight"))
-    data.setdefault("switched_track", False)
-    data.setdefault("reply", "")
-    data.setdefault("clarifying_question", None)
-    data.setdefault("memory_update", "")
+    data.setdefault("ready_to_route", False)
+    data.setdefault("missing_fields", [])
+    data.setdefault("next_question", "")
     data.setdefault("suggested_agents", [])
+    data.setdefault("confidence_notes", "")
+    print(data)
 
-    suggested_ids = normalize_suggested_agents(data.get("suggested_agents"))
-    suggested_ids = should_restrict_agents(suggested_ids)
-    data["suggested_agents"] = suggested_ids
+    data["suggested_agents"] = normalize_suggested_agents(data.get("suggested_agents"))
 
-    routed_id = coerce_track_to_id(data.get("mentor_track"))
-    do_switch, forced_target_id = should_switch_mentor(
-        active_id=active_id,
-        routed_id=routed_id,
-        suggested_ids=suggested_ids,
-        user_message=effective_user_message,
-    )
-
-    if forced_target_id:
-        final_id = forced_target_id
-        switched = active_id is not None and final_id != active_id
-    else:
-        if not active_id:
-            final_id = routed_id or "adrian_insight"
-            switched = False
-        elif do_switch:
-            final_id = routed_id or active_id
-            switched = final_id != active_id
-        else:
-            final_id = active_id
-            switched = False
-
-    st.current_mentor_id = final_id
-    st.accept_count[final_id] = st.accept_count.get(final_id, 0) + 1
-    if switched:
-        st.switch_count += 1
-
-    if request.set_preferred_mentor:
-        st.preferred_mentor_id = final_id
-
-    data["mentor_track"] = ID_TO_NAME.get(final_id, "Adrian Insight")
-    data["switched_track"] = bool(switched)
-
-    if active_id and not switched:
-        data["suggested_agents"] = []
-
-    data["preferred_mentor"] = ID_TO_NAME.get(st.preferred_mentor_id) if st.preferred_mentor_id else None
-    data["session_id"] = sid
     return data
-
+    
 
 # -------------------------
 # Health
@@ -480,7 +566,7 @@ def health():
 # -------------------------
 # Unified endpoint
 # -------------------------
-@app.post("/api/assist", response_model=MentorResponse)
+@app.post("/api/assist", response_model=RouterResponse)
 async def assist(request: UnifiedAssistRequest):
     try:
         transcript: Optional[str] = None
@@ -502,15 +588,15 @@ async def assist(request: UnifiedAssistRequest):
 
         audio_base64 = None
         audio_mime_type = None
-        if request.mode == "voice" and data.get("reply"):
+        if request.mode == "voice" and data.get("next_question"):
             audio_base64, audio_mime_type = synthesize_text_to_base64_audio(
-                text=data["reply"],
+                text=data["next_question"],
                 voice_id=request.voice_id or "JBFqnCBsd6RMkjVDRZzb",
                 model_id=request.tts_model_id or "eleven_turbo_v2_5",
                 output_format=request.tts_output_format or "mp3_44100_128",
             )
 
-        return MentorResponse(
+        return RouterResponse(
             **data,
             mode=request.mode,
             transcript=transcript,
@@ -528,7 +614,7 @@ async def assist(request: UnifiedAssistRequest):
 # -------------------------
 # Optional backward-compatible endpoints
 # -------------------------
-@app.post("/api/mentor-assist", response_model=MentorResponse)
+@app.post("/api/mentor-assist", response_model=RouterResponse)
 async def mentor_assist_compat(request: UnifiedAssistRequest):
     request.mode = "text"
     return await assist(request)
